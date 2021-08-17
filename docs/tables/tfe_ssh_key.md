@@ -1,6 +1,6 @@
-# Table: tfe_organization
+# Table: tfe_ssh_key
 
-List ssh keys in a organization.
+List ssh keys in a Terraform Enterprise organization.
 
 Notes:
 * List queries require an `organization_name`.
