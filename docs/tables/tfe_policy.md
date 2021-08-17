@@ -1,4 +1,4 @@
-# Table: tfe_oauth_client
+# Table: tfe_policy
 
 List policies in a Terraform Enterprise organization.
 

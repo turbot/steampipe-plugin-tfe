@@ -4,7 +4,7 @@ List ssh keys in a Terraform Enterprise organization.
 
 Notes:
 * List queries require an `organization_name`.
-* Get queries require a workspace `id`.
+* Get queries require a ssh key `id`.
 
 ## Examples
 
