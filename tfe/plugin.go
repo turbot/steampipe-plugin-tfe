@@ -21,13 +21,17 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		},
 		TableMap: map[string]*plugin.Table{
 			"tfe_current_user":        tableTfeCurrentUser(ctx),
+			"tfe_oauth_client":        tableTfeOauthClient(ctx),
 			"tfe_organization":        tableTfeOrganization(ctx),
 			"tfe_organization_member": tableTfeOrganizationMember(ctx),
+			"tfe_policy":              tableTfePolicy(ctx),
 			"tfe_run":                 tableTfeRun(ctx),
+			"tfe_ssh_key":             tableTfeSshKey(ctx),
 			"tfe_team":                tableTfeTeam(ctx),
 			"tfe_team_member":         tableTfeTeamMember(ctx),
 			"tfe_user_token":          tableTfeUserToken(ctx),
 			"tfe_workspace":           tableTfeWorkspace(ctx),
+			"tfe_workspace_variable":  tableTfeWorkspaceVariable(ctx),
 		},
 	}
 	return p
