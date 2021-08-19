@@ -32,7 +32,7 @@ where
   organization_name = 'example-org-872e34' and policy_set_count > 0;
 ```
 
-### Get a oauth client by ID
+### Get a policy by ID
 
 ```sql
 select
