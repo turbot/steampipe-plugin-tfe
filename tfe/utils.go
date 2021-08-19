@@ -112,7 +112,7 @@ type Data struct {
 
 type Creds struct {
 	App   *app `json:"app.terraform.io,omitempty"`
-	Atlas *app `json:"atlas.terraform.io,omitempty"`
+	Atlas *app `json:"atlas.hashicorp.com,omitempty"`
 }
 
 type app struct {
