@@ -36,7 +36,10 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 			return nil, errors.New("error reading the credential file")
 		}
 		var res Data
-		json.Unmarshal(b, &res)
+		err = json.Unmarshal(b, &res)
+		if err != nil {
+			return nil, errors.New("unable to parse the credential file")
+		}
 
 		if res.Credentials != nil {
 			if res.Credentials.App != nil {
@@ -50,8 +53,14 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	}
 
 	// Default to the env var settings
-	hostname = os.Getenv("TFE_HOSTNAME")
-	token = os.Getenv("TFE_TOKEN")
+	if os.Getenv("TFE_TOKEN") != "" {
+		token = os.Getenv("TFE_TOKEN")
+	}
+
+	if os.Getenv("TFE_HOSTNAME") != "" {
+		token = os.Getenv("TFE_HOSTNAME")
+	}
+
 	sslSkipVerify := strings.ToLower(os.Getenv("TFE_SSL_SKIP_VERIFY")) == "true"
 
 	// Prefer config settings
