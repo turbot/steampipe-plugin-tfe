@@ -2,10 +2,6 @@
 
 List ssh keys in a Terraform Enterprise organization.
 
-Notes:
-* List queries require an `organization_name`.
-* Get queries require a ssh key `id`.
-
 ## Examples
 
 ### List ssh keys in a organization
@@ -14,9 +10,7 @@ Notes:
 select
   *
 from
-  tfe_ssh_key
-where
-  organization_name = 'example-org-872e34';
+  tfe_ssh_key;
 ```
 
 ### Get a ssh keys by id

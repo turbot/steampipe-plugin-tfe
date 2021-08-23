@@ -1,11 +1,6 @@
 # Table: tfe_policy
 
 List policies in a Terraform Enterprise organization.
-
-Notes:
-* List queries require an `organization_name`.
-* Get queries require a policy `id`.
-
 ## Examples
 
 ### List policies
@@ -14,9 +9,7 @@ Notes:
 select
   *
 from
-  tfe_policy
-where
-  organization_name = 'example-org-872e34';
+  tfe_policy;
 ```
 
 ### List policies which have policy sets
@@ -29,7 +22,7 @@ select
 from
   tfe_policy
 where
-  organization_name = 'example-org-872e34' and policy_set_count > 0;
+  policy_set_count > 0;
 ```
 
 ### Get a policy by ID

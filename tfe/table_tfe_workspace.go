@@ -15,7 +15,6 @@ func tableTfeWorkspace(ctx context.Context) *plugin.Table {
 		Name:        "tfe_workspace",
 		Description: "Workspaces for the user.",
 		List: &plugin.ListConfig{
-			KeyColumns: plugin.SingleColumn("organization_name"),
 			Hydrate:    listWorkspace,
 		},
 		Get: &plugin.GetConfig{
@@ -44,7 +43,7 @@ func tableTfeWorkspace(ctx context.Context) *plugin.Table {
 			{Name: "migration_environment", Type: proto.ColumnType_STRING, Description: ""},
 			// Deprecated - {Name: "operations", Type: proto.ColumnType_BOOL, Description: ""},
 			{Name: "organization", Type: proto.ColumnType_JSON, Description: ""},
-			{Name: "organization_name", Type: proto.ColumnType_STRING, Transform: transform.FromQual("organization_name"), Description: "Name of the organization containing the workspace."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the workspace."},
 			{Name: "permissions", Type: proto.ColumnType_JSON, Description: ""},
 			{Name: "plan_duration_average", Type: proto.ColumnType_STRING, Description: "This is the average time runs spend in the plan phase, represented in milliseconds."},
 			{Name: "policy_check_failures", Type: proto.ColumnType_INT, Description: "Reports the number of run failures resulting from a policy check failure."},
@@ -66,14 +65,19 @@ func tableTfeWorkspace(ctx context.Context) *plugin.Table {
 	}
 }
 
-func listWorkspace(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_workspace.listWorkspace", "connection_error", err)
 		return nil, err
 	}
+	data, err := GetOrganizationName(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	organizationName := data.(string)
 	include := "current_run"
-	result, err := conn.Workspaces.List(ctx, d.KeyColumnQuals["organization_name"].GetStringValue(), tfe.WorkspaceListOptions{Include: &include})
+	result, err := conn.Workspaces.List(ctx, organizationName, tfe.WorkspaceListOptions{Include: &include})
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_workspace.listWorkspace", "query_error", err)
 		return nil, err

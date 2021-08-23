@@ -28,7 +28,7 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	if credFile == "" {
 		credFile = os.Getenv("TF_CONFIG_FILE")
 	}
-	var token, hostname string
+	var token, hostname, organization string
 	if credFile != "" {
 		// Read the token info from credential file path stored in env variables
 		b, err := ioutil.ReadFile(credFile)
@@ -74,6 +74,9 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	if tfeConfig.SSLSkipVerify != nil {
 		sslSkipVerify = *tfeConfig.SSLSkipVerify
 	}
+	if tfeConfig.Organization != nil {
+		organization = *tfeConfig.Organization
+	}
 
 	// Error if the minimum config is not set
 	if hostname == "" {
@@ -81,6 +84,9 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	}
 	if token == "" {
 		return nil, errors.New("token must be configured")
+	}
+	if organization == "" {
+		return nil, errors.New("organization must be configured")
 	}
 
 	// HTTP client and TLS config
@@ -109,6 +115,25 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	d.ConnectionManager.Cache.Set(cacheKey, conn)
 
 	return conn, nil
+}
+
+func GetOrganizationName(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	cacheKey := "GetOrganization"
+
+	// if found in cache, return the result
+	if cachedData, ok := d.ConnectionManager.Cache.Get(cacheKey); ok {
+		return cachedData.(string), nil
+	}
+	tfeConfig := GetConfig(d.Connection)
+	var organization string
+	if tfeConfig.Organization != nil {
+		organization = *tfeConfig.Organization
+	}
+
+	// save to extension cache
+	d.ConnectionManager.Cache.Set(cacheKey, organization)
+	return organization, nil
+
 }
 
 func isNotFoundError(err error) bool {

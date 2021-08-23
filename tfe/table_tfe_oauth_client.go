@@ -14,7 +14,6 @@ func tableTfeOauthClient(ctx context.Context) *plugin.Table {
 		Name:        "tfe_oauth_client",
 		Description: "OAuth clients in the organization.",
 		List: &plugin.ListConfig{
-			KeyColumns: plugin.SingleColumn("organization_name"),
 			Hydrate:    listOauthClient,
 		},
 		Get: &plugin.GetConfig{
@@ -41,13 +40,18 @@ func tableTfeOauthClient(ctx context.Context) *plugin.Table {
 	}
 }
 
-func listOauthClient(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listOauthClient(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_oauth_client.listOauthClient", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.OAuthClients.List(ctx, d.KeyColumnQuals["organization_name"].GetStringValue(), tfe.OAuthClientListOptions{})
+	data, err := GetOrganizationName(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	organizationName := data.(string)
+	result, err := conn.OAuthClients.List(ctx, organizationName, tfe.OAuthClientListOptions{})
 	if err != nil {
 		if isNotFoundError(err) {
 			return nil, nil

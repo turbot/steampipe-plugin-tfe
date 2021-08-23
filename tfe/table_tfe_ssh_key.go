@@ -14,7 +14,6 @@ func tableTfeSshKey(ctx context.Context) *plugin.Table {
 		Name:        "tfe_ssh_key",
 		Description: "SSH keys in the organization.",
 		List: &plugin.ListConfig{
-			KeyColumns: plugin.SingleColumn("organization_name"),
 			Hydrate:    listSshKey,
 		},
 		Get: &plugin.GetConfig{
@@ -26,18 +25,23 @@ func tableTfeSshKey(ctx context.Context) *plugin.Table {
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the ssh key."},
 			// Others columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "ID of the ssh key."},
-			{Name: "organization_name", Type: proto.ColumnType_STRING, Transform: transform.FromQual("organization_name"), Description: "Name of the organization containing the ssh key."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the ssh key."},
 		},
 	}
 }
 
-func listSshKey(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_ssh_key.listSshKey", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.SSHKeys.List(ctx, d.KeyColumnQuals["organization_name"].GetStringValue(), tfe.SSHKeyListOptions{})
+	data, err := GetOrganizationName(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	organizationName := data.(string)
+	result, err := conn.SSHKeys.List(ctx, organizationName, tfe.SSHKeyListOptions{})
 	if err != nil {
 		if isNotFoundError(err) {
 			return nil, nil

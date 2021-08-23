@@ -14,7 +14,6 @@ func tableTfeTeam(ctx context.Context) *plugin.Table {
 		Name:        "tfe_team",
 		Description: "Teams in the organization.",
 		List: &plugin.ListConfig{
-			KeyColumns: plugin.SingleColumn("organization_name"),
 			Hydrate:    listTeam,
 		},
 		Get: &plugin.GetConfig{
@@ -28,20 +27,25 @@ func tableTfeTeam(ctx context.Context) *plugin.Table {
 			// Others columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "ID of the team."},
 			{Name: "organization_access", Type: proto.ColumnType_JSON, Description: "Organization access granted to the team."},
-			{Name: "organization_name", Type: proto.ColumnType_STRING, Transform: transform.FromQual("organization_name"), Description: "Name of the organization containing the team."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the team."},
 			{Name: "permissions", Type: proto.ColumnType_JSON, Description: "Permissions granted to the team."},
 			{Name: "visibility", Type: proto.ColumnType_STRING, Description: "The team's visibility: secret, organization."},
 		},
 	}
 }
 
-func listTeam(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listTeam(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_team.listTeam", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.Teams.List(ctx, d.KeyColumnQuals["organization_name"].GetStringValue(), tfe.TeamListOptions{})
+	data, err := GetOrganizationName(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	organizationName := data.(string)
+	result, err := conn.Teams.List(ctx, organizationName, tfe.TeamListOptions{})
 	if err != nil {
 		if isNotFoundError(err) {
 			return nil, nil

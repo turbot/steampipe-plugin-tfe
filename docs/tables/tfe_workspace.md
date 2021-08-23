@@ -2,10 +2,6 @@
 
 List workspaces in the Terraform Enterprise organization.
 
-Notes:
-* List queries require an `organization_name`.
-* Get queries require a workspace `id`.
-
 ## Examples
 
 ### List workspaces
@@ -14,9 +10,7 @@ Notes:
 select
   *
 from
-  tfe_workspace
-where
-  organization_name = 'example-org-8a362a'
+  tfe_workspace;
 ```
 
 ### Get a workspace by ID
@@ -27,5 +21,5 @@ select
 from
   tfe_workspace
 where
-  id = 'ws-ocYGM1ouZNZWZoUy'
+  id = 'ws-ocYGM1ouZNZWZoUy';
 ```

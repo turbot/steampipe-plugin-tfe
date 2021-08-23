@@ -9,6 +9,7 @@ type tfeConfig struct {
 	Hostname      *string `cty:"hostname"`
 	Token         *string `cty:"token"`
 	SSLSkipVerify *bool   `cty:"ssl_skip_verify"`
+	Organization  *string `cty:"organization"`
 }
 
 var ConfigSchema = map[string]*schema.Attribute{
@@ -20,6 +21,9 @@ var ConfigSchema = map[string]*schema.Attribute{
 	},
 	"ssl_skip_verify": {
 		Type: schema.TypeBool,
+	},
+	"organization": {
+		Type: schema.TypeString,
 	},
 }
 

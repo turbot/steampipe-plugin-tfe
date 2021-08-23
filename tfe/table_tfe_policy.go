@@ -14,7 +14,6 @@ func tableTfePolicy(ctx context.Context) *plugin.Table {
 		Name:        "tfe_policy",
 		Description: "Policies in the organization.",
 		List: &plugin.ListConfig{
-			KeyColumns: plugin.SingleColumn("organization_name"),
 			Hydrate:    listPolicy,
 		},
 		Get: &plugin.GetConfig{
@@ -26,7 +25,7 @@ func tableTfePolicy(ctx context.Context) *plugin.Table {
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the policy."},
 			// Others columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "The ID of the policy."},
-			{Name: "organization_name", Type: proto.ColumnType_STRING, Transform: transform.FromQual("organization_name"), Description: "Name of the organization containing the policy."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the policy."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "A description of the policy's purpose. This field supports Markdown and will be rendered in the Terraform Cloud UI."},
 			{Name: "policy_set_count", Type: proto.ColumnType_INT, Description: "The number of policy sets in the policy"},
 			{Name: "updated_at", Type: proto.ColumnType_TIMESTAMP, Description: "The update timestamp of the policy."},
@@ -36,13 +35,18 @@ func tableTfePolicy(ctx context.Context) *plugin.Table {
 	}
 }
 
-func listPolicy(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_policy.listPolicy", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.Policies.List(ctx, d.KeyColumnQuals["organization_name"].GetStringValue(), tfe.PolicyListOptions{})
+	data, err := GetOrganizationName(ctx, d, h)
+	if err != nil {
+		return nil, err
+	}
+	organizationName := data.(string)
+	result, err := conn.Policies.List(ctx, organizationName, tfe.PolicyListOptions{})
 	if err != nil {
 		if isNotFoundError(err) {
 			return nil, nil

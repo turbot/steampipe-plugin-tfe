@@ -2,10 +2,6 @@
 
 List oauth clients in a Terraform Enterprise organization.
 
-Notes:
-* List queries require an `organization_name`.
-* Get queries require a oauth client `id`.
-
 ## Examples
 
 ### List oauth clients
@@ -14,9 +10,7 @@ Notes:
 select
   *
 from
-  tfe_oauth_client
-where
-  organization_name = 'example-org-8a362a';
+  tfe_oauth_client;
 ```
 
 ### Get a oauth client by ID
@@ -39,8 +33,6 @@ select
   date_part('day', age(current_timestamp, created_at)) as age_days
 from
   tfe_oauth_client
-where
-  organization_name = 'example-org-8a362a'
 order by
   age_days desc;
 ```

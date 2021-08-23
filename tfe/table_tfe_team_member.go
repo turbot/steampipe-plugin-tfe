@@ -15,7 +15,6 @@ func tableTfeTeamMember(ctx context.Context) *plugin.Table {
 		Name:        "tfe_team_member",
 		Description: "Team members in the organization.",
 		List: &plugin.ListConfig{
-			KeyColumns:    plugin.SingleColumn("organization_name"),
 			ParentHydrate: listTeam,
 			Hydrate:       listTeamMember,
 		},
@@ -26,7 +25,7 @@ func tableTfeTeamMember(ctx context.Context) *plugin.Table {
 			// Other columns
 			{Name: "avatar_url", Type: proto.ColumnType_STRING, Description: "URL of the user avatar."},
 			{Name: "is_service_account", Type: proto.ColumnType_BOOL, Description: "True if the user is a service account."},
-			{Name: "organization_name", Type: proto.ColumnType_STRING, Transform: transform.FromQual("organization_name"), Description: "ID of the organization containing the team."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "ID of the organization containing the team."},
 			{Name: "two_factor", Type: proto.ColumnType_JSON, Description: "Details of two factor authentication for the user."},
 			{Name: "user_id", Type: proto.ColumnType_STRING, Transform: transform.FromField("ID"), Description: "ID of the user."},
 			{Name: "v2_only", Type: proto.ColumnType_BOOL, Description: "If true, the user can only use v2."},
