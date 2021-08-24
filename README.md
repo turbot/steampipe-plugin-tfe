@@ -25,9 +25,7 @@ select
   execution_mode,
   resource_count
 from
-  tfe_workspace
-where
-  organization_name = 'my-org'
+  tfe_workspace;
 ```
 
 ## Developing
