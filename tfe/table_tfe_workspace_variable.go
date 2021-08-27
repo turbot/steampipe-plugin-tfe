@@ -43,13 +43,22 @@ func listWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		plugin.Logger(ctx).Error("tfe_workspace_variable.listVariable", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.Variables.List(ctx, d.KeyColumnQuals["workspace_id"].GetStringValue(), tfe.VariableListOptions{})
-	if err != nil {
-		plugin.Logger(ctx).Error("tfe_workspace_variable.listVariable", "query_error", err)
-		return nil, err
-	}
-	for _, i := range result.Items {
-		d.StreamListItem(ctx, i)
+	options := tfe.VariableListOptions{}
+	pagesLeft := true
+	for pagesLeft {
+		result, err := conn.Variables.List(ctx, d.KeyColumnQuals["workspace_id"].GetStringValue(), options)
+		if err != nil {
+			plugin.Logger(ctx).Error("tfe_workspace_variable.listVariable", "query_error", err)
+			return nil, err
+		}
+		for _, i := range result.Items {
+			d.StreamListItem(ctx, i)
+		}
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
+		} else {
+			pagesLeft = false
+		}
 	}
 	return nil, nil
 }

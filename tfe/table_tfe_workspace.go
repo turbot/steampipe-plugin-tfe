@@ -77,13 +77,24 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 	}
 	organizationName := data.(string)
 	include := "current_run"
-	result, err := conn.Workspaces.List(ctx, organizationName, tfe.WorkspaceListOptions{Include: &include})
-	if err != nil {
-		plugin.Logger(ctx).Error("tfe_workspace.listWorkspace", "query_error", err)
-		return nil, err
+	options := tfe.WorkspaceListOptions{
+		Include: &include,
 	}
-	for _, i := range result.Items {
-		d.StreamListItem(ctx, i)
+	pagesLeft := true
+	for pagesLeft {
+		result, err := conn.Workspaces.List(ctx, organizationName, options)
+		if err != nil {
+			plugin.Logger(ctx).Error("tfe_workspace.listWorkspace", "query_error", err)
+			return nil, err
+		}
+		for _, i := range result.Items {
+			d.StreamListItem(ctx, i)
+		}
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
+		} else {
+			pagesLeft = false
+		}
 	}
 	return nil, nil
 }

@@ -45,16 +45,25 @@ func listTeam(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (
 		return nil, err
 	}
 	organizationName := data.(string)
-	result, err := conn.Teams.List(ctx, organizationName, tfe.TeamListOptions{})
-	if err != nil {
-		if isNotFoundError(err) {
-			return nil, nil
+	options := tfe.TeamListOptions{}
+	pagesLeft := true
+	for pagesLeft {
+		result, err := conn.Teams.List(ctx, organizationName, options)
+		if err != nil {
+			if isNotFoundError(err) {
+				return nil, nil
+			}
+			plugin.Logger(ctx).Error("tfe_team.listTeam", "query_error", err)
+			return nil, err
 		}
-		plugin.Logger(ctx).Error("tfe_team.listTeam", "query_error", err)
-		return nil, err
-	}
-	for _, i := range result.Items {
-		d.StreamListItem(ctx, i)
+		for _, i := range result.Items {
+			d.StreamListItem(ctx, i)
+		}
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
+		} else {
+			pagesLeft = false
+		}
 	}
 	return nil, nil
 }

@@ -46,13 +46,22 @@ func listOrganization(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 		plugin.Logger(ctx).Error("tfe_organization.listOrganization", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.Organizations.List(ctx, tfe.OrganizationListOptions{})
-	if err != nil {
-		plugin.Logger(ctx).Error("tfe_organization.listOrganization", "query_error", err)
-		return nil, err
-	}
-	for _, i := range result.Items {
-		d.StreamListItem(ctx, i)
+	options := tfe.OrganizationListOptions{}
+	pagesLeft := true
+	for pagesLeft {
+		result, err := conn.Organizations.List(ctx, options)
+		if err != nil {
+			plugin.Logger(ctx).Error("tfe_organization.listOrganization", "query_error", err)
+			return nil, err
+		}
+		for _, i := range result.Items {
+			d.StreamListItem(ctx, i)
+		}
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
+		} else {
+			pagesLeft = false
+		}
 	}
 	return nil, nil
 }

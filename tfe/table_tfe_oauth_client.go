@@ -14,7 +14,7 @@ func tableTfeOauthClient(ctx context.Context) *plugin.Table {
 		Name:        "tfe_oauth_client",
 		Description: "OAuth clients in the organization.",
 		List: &plugin.ListConfig{
-			Hydrate:    listOauthClient,
+			Hydrate: listOauthClient,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("id"),
@@ -51,16 +51,26 @@ func listOauthClient(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrate
 		return nil, err
 	}
 	organizationName := data.(string)
-	result, err := conn.OAuthClients.List(ctx, organizationName, tfe.OAuthClientListOptions{})
-	if err != nil {
-		if isNotFoundError(err) {
-			return nil, nil
+	options := tfe.OAuthClientListOptions{}
+	pagesLeft := true
+	for pagesLeft {
+		result, err := conn.OAuthClients.List(ctx, organizationName, options)
+		if err != nil {
+			if isNotFoundError(err) {
+				return nil, nil
+			}
+			plugin.Logger(ctx).Error("tfe_oauth_client.listOauthClient", "query_error", err)
+			return nil, err
 		}
-		plugin.Logger(ctx).Error("tfe_oauth_client.listOauthClient", "query_error", err)
-		return nil, err
-	}
-	for _, i := range result.Items {
-		d.StreamListItem(ctx, i)
+		for _, i := range result.Items {
+			d.StreamListItem(ctx, i)
+		}
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
+		} else {
+			pagesLeft = false
+		}
+
 	}
 	return nil, nil
 }
