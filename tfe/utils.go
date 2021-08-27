@@ -3,19 +3,19 @@ package tfe
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/hashicorp/go-tfe"
+	"github.com/hashicorp/hcl"
 	"github.com/pkg/errors"
 
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
 
-func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
+func connect(ctx context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 
 	// Load connection from cache, which preserves throttling protection etc
 	cacheKey := "tfe"
@@ -23,31 +23,32 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 		return cachedData.(*tfe.Client), nil
 	}
 
-	credFile := os.Getenv("TF_CLI_CONFIG_FILE")
+	var token, organization string
+	// setting default hostname
+	hostname := "app.terraform.io"
 
-	if credFile == "" {
-		credFile = os.Getenv("TF_CONFIG_FILE")
+	if os.Getenv("TFE_HOSTNAME") != "" {
+		hostname = os.Getenv("TFE_HOSTNAME")
 	}
-	var token, hostname, organization string
-	if credFile != "" {
-		// Read the token info from credential file path stored in env variables
-		b, err := ioutil.ReadFile(credFile)
-		if err != nil {
-			return nil, errors.New("error reading the credential file")
-		}
-		var res Data
-		err = json.Unmarshal(b, &res)
-		if err != nil {
-			return nil, errors.New("unable to parse the credential file")
-		}
 
-		if res.Credentials != nil {
-			if res.Credentials.App != nil {
-				hostname = "https://app.terraform.io/"
-				token = res.Credentials.App.Token
-			} else {
-				hostname = "https://atlas.hashicorp.com/"
-				token = res.Credentials.Atlas.Token
+	configFilePath := os.Getenv("TF_CLI_CONFIG_FILE")
+
+	if configFilePath == "" {
+		configFilePath = os.Getenv("TERRAFORM_CONFIG")
+	}
+	if configFilePath != "" {
+		config, err := getCliConfig(configFilePath)
+		if err != nil {
+			return nil, err
+		}
+		// The hostname should be in format of "app.terraform.io" to match it in credential file
+		formatedHostname := hostname
+		if strings.HasPrefix(hostname, "https://") {
+			formatedHostname = strings.Split(hostname,"/")[2]
+		}
+		for k, v := range config.Credentials {
+			if k == formatedHostname {
+				token = v["token"].(string)
 			}
 		}
 	}
@@ -55,10 +56,6 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	// Default to the env var settings
 	if os.Getenv("TFE_TOKEN") != "" {
 		token = os.Getenv("TFE_TOKEN")
-	}
-
-	if os.Getenv("TFE_HOSTNAME") != "" {
-		token = os.Getenv("TFE_HOSTNAME")
 	}
 
 	sslSkipVerify := strings.ToLower(os.Getenv("TFE_SSL_SKIP_VERIFY")) == "true"
@@ -79,15 +76,18 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	}
 
 	// Error if the minimum config is not set
-	if hostname == "" {
-		hostname = "https://app.terraform.io/"
-	}
 	if token == "" {
 		return nil, errors.New("token must be configured")
 	}
 	if organization == "" {
 		return nil, errors.New("organization must be configured")
 	}
+
+	// formatting hostname to pass the client
+	fullHostName := hostname
+	if !strings.HasPrefix(hostname, "https://") {
+			fullHostName =  "https://"+hostname+"/"
+		}
 
 	// HTTP client and TLS config
 	httpClient := tfe.DefaultConfig().HTTPClient
@@ -99,7 +99,7 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 
 	// Create a new TFE client config
 	cfg := &tfe.Config{
-		Address:    hostname,
+		Address:    fullHostName,
 		Token:      token,
 		HTTPClient: httpClient,
 	}
@@ -140,15 +140,31 @@ func isNotFoundError(err error) bool {
 	return err.Error() == "resource not found"
 }
 
-type Data struct {
-	Credentials *Creds `json:"credentials,omitempty"`
+func getCliConfig(filePath string) (*Config, error) {
+	config := &Config{}
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return nil, errors.New("error reading the CLI config file")
+	}
+
+	// Parse the CLI config file content.
+	obj, err := hcl.Parse(string(content))
+	if err != nil {
+		return nil, errors.New("error parsing the CLI config file")
+	}
+
+	// Decode the CLI config file content.
+	if err := hcl.DecodeObject(&config, obj); err != nil {
+		return nil, errors.New("error decoding the CLI config file")
+	}
+	return config, nil
 }
 
-type Creds struct {
-	App   *app `json:"app.terraform.io,omitempty"`
-	Atlas *app `json:"atlas.hashicorp.com,omitempty"`
+type Config struct {
+	Hosts       map[string]*ConfigHost            `hcl:"host"`
+	Credentials map[string]map[string]interface{} `hcl:"credentials"`
 }
 
-type app struct {
-	Token string `json:"token,omitempty"`
+type ConfigHost struct {
+	Services map[string]interface{} `hcl:"services"`
 }

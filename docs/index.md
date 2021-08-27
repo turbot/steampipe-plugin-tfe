@@ -63,9 +63,10 @@ Installing the latest tfe plugin will create a config file (`~/.steampipe/config
 
 ```hcl
 connection "tfe" {
-  plugin = "tfe"
-  token  = "5a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fbd"
-  organization = "example-org-872e34"
+  plugin        = "tfe"
+  token         = "5a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fbd"
+  organization  = "example-org-872e34"
+  # hostname    = "app.terraform.io"
 }
 ```
 
@@ -81,20 +82,20 @@ connection "tfe" {
 
 You may create multiple tfe connections:
 ```hcl
-connection "tfe_01 {
+connection "tfe_01" {
   plugin        = "tfe"
   token         = "5a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fbd"
   organization  = "example-org-872e34"
 }
 
-connection "tfe_02 {
-  plugin      = "tfe"
+connection "tfe_02" {
+  plugin        = "tfe"
   token         = "6a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fcd"
   organization  = "example-org-123f45"
 }
 
-connection "tfe_03 {
-  plugin      = "tfe"
+connection "tfe_03" {
+  plugin        = "tfe"
   token         = "7a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fef"
   organization  = "example-org-123f90"
 }
@@ -103,19 +104,19 @@ connection "tfe_03 {
 Each connection is implemented as a distinct [Postgres schema](https://www.postgresql.org/docs/current/ddl-schemas.html).  As such, you can use qualified table names to query a specific connection:
 
 ```sql
-select * from tfe_02.tfe_organization_member
+select * from tfe_02.tfe_workspace
 ```
 
 Alternatively, can use an unqualified name and it will be resolved according to the [Search Path](https://steampipe.io/docs/using-steampipe/managing-connections#setting-the-search-path):
 ```sql
-select * from tfe_organization_member
+select * from tfe_workspace
 ```
 
 
 You can multi-organization connections by using an [**aggregator** connection](https://steampipe.io/docs/using-steampipe/managing-connections#using-aggregators).  Aggregators allow you to query data from multiple connections for a plugin as if they are a single connection:
 
 ```
-connection "tfe_all {
+connection "tfe_all" {
   plugin      = "tfe"
   type        = "aggregator"
   connections = ["tfe_01", "tfe_02", "tfe_03"]
