@@ -43,7 +43,19 @@ func listWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		plugin.Logger(ctx).Error("tfe_workspace_variable.listVariable", "connection_error", err)
 		return nil, err
 	}
+	limit := d.QueryContext.Limit
+	var defaultPageSize, pagesToIterate, lastPageSize int64
+	defaultPageSize = 20
 	options := tfe.VariableListOptions{}
+	if limit != nil {
+		// default size is 20
+		if *limit < defaultPageSize {
+			options.PageSize = int(*limit)
+		}
+		pagesToIterate = *limit / defaultPageSize
+		lastPageSize = *limit % defaultPageSize
+	}
+
 	pagesLeft := true
 	for pagesLeft {
 		result, err := conn.Variables.List(ctx, d.KeyColumnQuals["workspace_id"].GetStringValue(), options)
@@ -54,10 +66,22 @@ func listWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 		}
-		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-			options.PageNumber = result.Pagination.NextPage
+		// Pagination with limit
+		if limit != nil && *limit > defaultPageSize {
+			if result.Pagination.CurrentPage < int(pagesToIterate) {
+				options.PageNumber = result.Pagination.NextPage
+			} else if result.Pagination.CurrentPage == int(pagesToIterate) {
+				options.PageSize = int(lastPageSize)
+			} else {
+				pagesLeft = false
+			}
 		} else {
-			pagesLeft = false
+			// normal pagination
+			if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+				options.PageNumber = result.Pagination.NextPage
+			} else {
+				pagesLeft = false
+			}
 		}
 	}
 	return nil, nil

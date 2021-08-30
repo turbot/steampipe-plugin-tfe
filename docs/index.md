@@ -55,7 +55,7 @@ steampipe plugin install tfe
 | :---------- | :--------------------------------------------------------------------------- |
 | Credentials | Terraform Cloud/Enterprise requires a [token](https://www.terraform.io/docs/cloud/users-teams-organizations/api-tokens.html) for all requests. |
 | Radius      | Each connection represents a single Terraform Cloud/Enterprise account. |
-| Resolution  |  1. Credentials explicitly set in a steampipe config file (`~/.steampipe/config/tfe.spc`).<br />2. Credentials specified in environment variables e.g. `TFE_TOKEN`.<br />3. Credentials in the credential file (for example `~/.terraform.d/credentials.tfrc.json` on Linux systems) for the path specified in the `TF_CLI_CONFIG_FILE` or `TERRAFORM_CONFIG` environment variable.|
+| Resolution  |  1. Credentials explicitly set in a steampipe config file (`~/.steampipe/config/tfe.spc`).<br />2. Credentials specified in environment variables e.g. `TFE_TOKEN`.|
 
 ### Configuration
 

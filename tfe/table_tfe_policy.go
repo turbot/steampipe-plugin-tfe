@@ -46,7 +46,19 @@ func listPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 		return nil, err
 	}
 	organizationName := data.(string)
+	limit := d.QueryContext.Limit
+	var defaultPageSize, pagesToIterate, lastPageSize int64
+	defaultPageSize = 20
 	options := tfe.PolicyListOptions{}
+	if limit != nil {
+		// default size is 20
+		if *limit < defaultPageSize {
+			options.PageSize = int(*limit)
+		}
+		pagesToIterate = *limit / defaultPageSize
+		lastPageSize = *limit % defaultPageSize
+	}
+
 	pagesLeft := true
 	for pagesLeft {
 		result, err := conn.Policies.List(ctx, organizationName, options)
@@ -60,10 +72,22 @@ func listPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 		}
-		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-			options.PageNumber = result.Pagination.NextPage
+		// Pagination with limit
+		if limit != nil && *limit > defaultPageSize {
+			if result.Pagination.CurrentPage < int(pagesToIterate) {
+				options.PageNumber = result.Pagination.NextPage
+			} else if result.Pagination.CurrentPage == int(pagesToIterate) {
+				options.PageSize = int(lastPageSize)
+			} else {
+				pagesLeft = false
+			}
 		} else {
-			pagesLeft = false
+			// normal pagination
+			if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+				options.PageNumber = result.Pagination.NextPage
+			} else {
+				pagesLeft = false
+			}
 		}
 	}
 	return nil, nil

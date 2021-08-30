@@ -33,7 +33,7 @@ func tableTfeOauthClient(ctx context.Context) *plugin.Table {
 			{Name: "organization_name", Type: proto.ColumnType_STRING, Transform: transform.FromField("Organization.Name"), Description: "Name of the organization containing the oauth client."},
 			{Name: "service_provider", Type: proto.ColumnType_STRING, Description: "The VCS provider being connected with. Valid options are ado_server, ado_services, github, github_enterprise, gitlab_hosted, gitlab_community_edition, or gitlab_enterprise_edition."},
 			{Name: "service_provider_name", Type: proto.ColumnType_STRING, Description: "The name of VCS provider being connected with."},
-			{Name: "RSA_public_key", Type: proto.ColumnType_STRING, Description: "The public key of the oauth client."},
+			{Name: "rsa_public_key", Type: proto.ColumnType_STRING, Description: "The public key of the oauth client.", Transform: transform.FromField("RSAPublicKey")},
 			{Name: "oauth_token", Type: proto.ColumnType_JSON, Description: "The token information you were given by your VCS provider."},
 			{Name: "organization", Type: proto.ColumnType_JSON, Description: "The organization information."},
 		},
@@ -51,7 +51,20 @@ func listOauthClient(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrate
 		return nil, err
 	}
 	organizationName := data.(string)
+
+	limit := d.QueryContext.Limit
+	var defaultPageSize, pagesToIterate, lastPageSize int64
+	defaultPageSize = 20
 	options := tfe.OAuthClientListOptions{}
+	if limit != nil {
+		// default size is 20
+		if *limit < defaultPageSize {
+			options.PageSize = int(*limit)
+		}
+		pagesToIterate = *limit / defaultPageSize
+		lastPageSize = *limit % defaultPageSize
+	}
+
 	pagesLeft := true
 	for pagesLeft {
 		result, err := conn.OAuthClients.List(ctx, organizationName, options)
@@ -65,10 +78,21 @@ func listOauthClient(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrate
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 		}
-		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-			options.PageNumber = result.Pagination.NextPage
+		// Pagination with limit
+		if limit != nil && *limit > defaultPageSize {
+			if result.Pagination.CurrentPage < int(pagesToIterate) {
+				options.PageNumber = result.Pagination.NextPage
+			} else if result.Pagination.CurrentPage == int(pagesToIterate) {
+				options.PageSize = int(lastPageSize)
+			} else {
+				pagesLeft = false
+			}
 		} else {
-			pagesLeft = false
+			if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+				options.PageNumber = result.Pagination.NextPage
+			} else {
+				pagesLeft = false
+			}
 		}
 
 	}
