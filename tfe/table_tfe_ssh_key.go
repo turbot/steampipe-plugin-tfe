@@ -42,16 +42,16 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 	}
 	organizationName := data.(string)
 	limit := d.QueryContext.Limit
-	var defaultPageSize, pagesToIterate, lastPageSize int64
-	defaultPageSize = 20
-	options := tfe.SSHKeyListOptions{}
+	options := tfe.SSHKeyListOptions{
+		ListOptions: tfe.ListOptions{
+			// https://www.terraform.io/docs/cloud/api/index.html#pagination
+			PageSize: 100,
+		},
+	}
 	if limit != nil {
-		// default size is 20
-		if *limit < defaultPageSize {
+		if *limit < int64(100) {
 			options.PageSize = int(*limit)
 		}
-		pagesToIterate = *limit / defaultPageSize
-		lastPageSize = *limit % defaultPageSize
 	}
 
 	pagesLeft := true
@@ -66,23 +66,16 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 		}
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
+			// Context can be cancelled due to manual cancellation or the limit has been hit
+			if plugin.IsCancelled(ctx) {
+				return nil, nil
+			}
 		}
-		// Pagination with limit
-		if limit != nil && *limit > defaultPageSize {
-			if result.Pagination.CurrentPage < int(pagesToIterate) {
-				options.PageNumber = result.Pagination.NextPage
-			} else if result.Pagination.CurrentPage == int(pagesToIterate) {
-				options.PageSize = int(lastPageSize)
-			} else {
-				pagesLeft = false
-			}
+		// Pagination
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
 		} else {
-			// normal pagination
-			if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-				options.PageNumber = result.Pagination.NextPage
-			} else {
-				pagesLeft = false
-			}
+			pagesLeft = false
 		}
 	}
 	return nil, nil

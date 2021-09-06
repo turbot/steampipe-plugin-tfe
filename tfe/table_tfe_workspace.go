@@ -78,18 +78,17 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 	organizationName := data.(string)
 	include := "current_run"
 	limit := d.QueryContext.Limit
-	var defaultPageSize, pagesToIterate, lastPageSize int64
-	defaultPageSize = 20
 	options := tfe.WorkspaceListOptions{
 		Include: &include,
+		ListOptions: tfe.ListOptions{
+			// https://www.terraform.io/docs/cloud/api/index.html#pagination
+			PageSize: 100,
+		},
 	}
 	if limit != nil {
-		// default size is 20
-		if *limit < defaultPageSize {
+		if *limit < int64(100) {
 			options.PageSize = int(*limit)
 		}
-		pagesToIterate = *limit / defaultPageSize
-		lastPageSize = *limit % defaultPageSize
 	}
 
 	pagesLeft := true
@@ -102,22 +101,11 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 		}
-		// Pagination with limit
-		if limit != nil && *limit > defaultPageSize {
-			if result.Pagination.CurrentPage < int(pagesToIterate) {
-				options.PageNumber = result.Pagination.NextPage
-			} else if result.Pagination.CurrentPage == int(pagesToIterate) {
-				options.PageSize = int(lastPageSize)
-			} else {
-				pagesLeft = false
-			}
+		// Pagination
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
 		} else {
-			// normal pagination
-			if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-				options.PageNumber = result.Pagination.NextPage
-			} else {
-				pagesLeft = false
-			}
+			pagesLeft = false
 		}
 	}
 	return nil, nil
