@@ -1,10 +1,10 @@
 # Table: tfe_oauth_client
 
-List oauth clients in a Terraform Enterprise organization.
+List OAuth clients in a Terraform Enterprise organization.
 
 ## Examples
 
-### List oauth clients
+### Basic info
 
 ```sql
 select
@@ -13,7 +13,7 @@ from
   tfe_oauth_client;
 ```
 
-### Get a oauth client by ID
+### Get an OAuth client by ID
 
 ```sql
 select
@@ -24,7 +24,7 @@ where
   id = 'oc-JM8tnPzgdo1wM3jy';
 ```
 
-### Oauth client by age in days
+### List OAuth clients sorted by age
 
 ```sql
 select
