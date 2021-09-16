@@ -13,7 +13,7 @@ from
   tfe_ssh_key;
 ```
 
-### Get an SSH keys by ID
+### Get SSH key by ID
 
 ```sql
 select
