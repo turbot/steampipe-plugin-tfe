@@ -55,7 +55,7 @@ steampipe plugin install tfe
 | :---------- | :--------------------------------------------------------------------------- |
 | Credentials | Terraform Cloud/Enterprise requires a [token](https://www.terraform.io/docs/cloud/users-teams-organizations/api-tokens.html) for all requests. |
 | Radius      | Each connection represents a single Terraform Cloud/Enterprise account. |
-| Resolution  |  1. Credentials explicitly set in a steampipe config file (`~/.steampipe/config/tfe.spc`).<br />2. Credentials specified in environment variables e.g. `TFE_TOKEN`.|
+| Resolution  |  1. Credentials explicitly set in a Steampipe config file (`~/.steampipe/config/tfe.spc`).<br />2. Credentials specified in environment variables e.g. `TFE_TOKEN`.|
 
 ### Configuration
 
@@ -63,14 +63,22 @@ Installing the latest tfe plugin will create a config file (`~/.steampipe/config
 
 ```hcl
 connection "tfe" {
-  plugin        = "tfe"
-  token         = "5a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fbd"
-  organization  = "example-org-872e34"
-  # hostname    = "app.terraform.io"
+  plugin = "tfe"
+
+  # Get your API token per https://www.terraform.io/docs/cloud/users-teams-organizations/api-tokens.html
+  # If `token` is not specified, Steampipe will use the token in the `TFE_TOKEN` environment variable, if set
+  #token = "hE1hlYILrSqpqh.atlasv1.ARuZuyzl33F71WR55s6ln5GQ1HWIwTDDH3MiRjz7OnpCfaCb1RCF5zGaSncCWmJdCYA"
+
+  # Name of the organization to connect to
+  #organization = "example-org"
+
+  # Terraform Cloud or Terraform Enterprise hostname
+  # If `hostname` is not specified, the hostname will be determined in the following order:
+  #   - The `TFE_HOSTNAME` environment variable, if set; otherwise
+  #   - Default to app.terraform.io
+  #hostname = "app.terraform.io"
 }
 ```
-
-- `token` - API token from Terraform Enterprise.
 
 ## Get involved
 
@@ -82,21 +90,21 @@ connection "tfe" {
 You may create multiple tfe connections:
 ```hcl
 connection "tfe_01" {
-  plugin        = "tfe"
-  token         = "5a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fbd"
-  organization  = "example-org-872e34"
+  plugin       = "tfe"
+  token        = "5a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fbd"
+  organization = "example-org-872e34"
 }
 
 connection "tfe_02" {
-  plugin        = "tfe"
-  token         = "6a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fcd"
-  organization  = "example-org-123f45"
+  plugin       = "tfe"
+  token        = "6a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fcd"
+  organization = "example-org-123f45"
 }
 
 connection "tfe_03" {
-  plugin        = "tfe"
-  token         = "7a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fef"
-  organization  = "example-org-123f90"
+  plugin       = "tfe"
+  token        = "7a76843869c183a4ea901c79102bfa1f667f39a2ea0ba857c9a35a9885d91fef"
+  organization = "example-org-123f90"
 }
 ```
 
@@ -106,13 +114,12 @@ Each connection is implemented as a distinct [Postgres schema](https://www.postg
 select * from tfe_02.tfe_workspace
 ```
 
-Alternatively, can use an unqualified name and it will be resolved according to the [Search Path](https://steampipe.io/docs/using-steampipe/managing-connections#setting-the-search-path):
+Alternatively, you can use an unqualified name and it will be resolved according to the [Search Path](https://steampipe.io/docs/using-steampipe/managing-connections#setting-the-search-path):
 ```sql
 select * from tfe_workspace
 ```
 
-
-You can multi-organization connections by using an [**aggregator** connection](https://steampipe.io/docs/using-steampipe/managing-connections#using-aggregators).  Aggregators allow you to query data from multiple connections for a plugin as if they are a single connection:
+You can use multi-organization connections by using an [**aggregator** connection](https://steampipe.io/docs/using-steampipe/managing-connections#using-aggregators).  Aggregators allow you to query data from multiple connections for a plugin as if they are a single connection:
 
 ```
 connection "tfe_all" {
@@ -137,4 +144,4 @@ connection "tfe_all" {
 }
 ```
 
-Aggregators are powerful, but they are not infinitely scalable. Like any other steampipe connection, they query APIs and are subject to API limits and throttling.
+Aggregators are powerful, but they are not infinitely scalable. Like any other Steampipe connection, they query APIs and are subject to API limits and throttling.
