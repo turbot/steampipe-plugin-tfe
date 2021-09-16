@@ -33,7 +33,7 @@ func listUserToken(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 		plugin.Logger(ctx).Error("tfe_user_token.listUserToken", "connection_error", err)
 		return nil, err
 	}
-	user := h.ParentItem.(*tfe.User)
+	user := h.Item.(*tfe.User)
 	result, err := conn.UserTokens.List(ctx, user.ID)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_user_token.listUserToken", "query_error", err)

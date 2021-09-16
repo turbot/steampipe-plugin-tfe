@@ -46,13 +46,38 @@ func listOrganization(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 		plugin.Logger(ctx).Error("tfe_organization.listOrganization", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.Organizations.List(ctx, tfe.OrganizationListOptions{})
-	if err != nil {
-		plugin.Logger(ctx).Error("tfe_organization.listOrganization", "query_error", err)
-		return nil, err
+	limit := d.QueryContext.Limit
+	options := tfe.OrganizationListOptions{
+		ListOptions: tfe.ListOptions{
+			// https://www.terraform.io/docs/cloud/api/index.html#pagination
+			PageSize: 100,
+		},
 	}
-	for _, i := range result.Items {
-		d.StreamListItem(ctx, i)
+	if limit != nil {
+		if *limit < int64(100) {
+			options.PageSize = int(*limit)
+		}
+	}
+	pagesLeft := true
+	for pagesLeft {
+		result, err := conn.Organizations.List(ctx, options)
+		if err != nil {
+			plugin.Logger(ctx).Error("tfe_organization.listOrganization", "query_error", err)
+			return nil, err
+		}
+		for _, i := range result.Items {
+			d.StreamListItem(ctx, i)
+			// Context can be cancelled due to manual cancellation or the limit has been hit
+			if plugin.IsCancelled(ctx) {
+				return nil, nil
+			}
+		}
+		// Pagination
+		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
+			options.PageNumber = result.Pagination.NextPage
+		} else {
+			pagesLeft = false
+		}
 	}
 	return nil, nil
 }

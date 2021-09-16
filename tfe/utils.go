@@ -13,7 +13,7 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin"
 )
 
-func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
+func connect(ctx context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 
 	// Load connection from cache, which preserves throttling protection etc
 	cacheKey := "tfe"
@@ -21,6 +21,7 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 		return cachedData.(*tfe.Client), nil
 	}
 
+	var organization string
 	// Default to the env var settings
 	hostname := os.Getenv("TFE_HOSTNAME")
 	token := os.Getenv("TFE_TOKEN")
@@ -28,24 +29,25 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 
 	// Prefer config settings
 	tfeConfig := GetConfig(d.Connection)
-	if &tfeConfig != nil {
-		if tfeConfig.Hostname != nil {
-			hostname = *tfeConfig.Hostname
-		}
-		if tfeConfig.Token != nil {
-			token = *tfeConfig.Token
-		}
-		if tfeConfig.SSLSkipVerify != nil {
-			sslSkipVerify = *tfeConfig.SSLSkipVerify
-		}
+	if tfeConfig.Hostname != nil {
+		hostname = *tfeConfig.Hostname
+	}
+	if tfeConfig.Token != nil {
+		token = *tfeConfig.Token
+	}
+	if tfeConfig.SSLSkipVerify != nil {
+		sslSkipVerify = *tfeConfig.SSLSkipVerify
+	}
+	if tfeConfig.Organization != nil {
+		organization = *tfeConfig.Organization
 	}
 
 	// Error if the minimum config is not set
-	if hostname == "" {
-		hostname = "https://app.terraform.io/"
-	}
 	if token == "" {
 		return nil, errors.New("token must be configured")
+	}
+	if organization == "" {
+		return nil, errors.New("organization must be configured")
 	}
 
 	// HTTP client and TLS config
@@ -55,6 +57,10 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 		transport.TLSClientConfig = &tls.Config{}
 	}
 	transport.TLSClientConfig.InsecureSkipVerify = sslSkipVerify
+
+	if !strings.HasPrefix(hostname, "https://") {
+			hostname =  "https://"+hostname
+		}
 
 	// Create a new TFE client config
 	cfg := &tfe.Config{
@@ -74,6 +80,25 @@ func connect(_ context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	d.ConnectionManager.Cache.Set(cacheKey, conn)
 
 	return conn, nil
+}
+
+func GetOrganizationName(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	cacheKey := "GetOrganization"
+
+	// if found in cache, return the result
+	if cachedData, ok := d.ConnectionManager.Cache.Get(cacheKey); ok {
+		return cachedData.(string), nil
+	}
+	tfeConfig := GetConfig(d.Connection)
+	var organization string
+	if tfeConfig.Organization != nil {
+		organization = *tfeConfig.Organization
+	}
+
+	// save to extension cache
+	d.ConnectionManager.Cache.Set(cacheKey, organization)
+	return organization, nil
+
 }
 
 func isNotFoundError(err error) bool {
