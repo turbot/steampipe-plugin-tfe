@@ -1,9 +1,10 @@
 # Table: tfe_policy
 
 List policies in a Terraform Enterprise organization.
+
 ## Examples
 
-### List policies
+### Basic info
 
 ```sql
 select
@@ -12,7 +13,7 @@ from
   tfe_policy;
 ```
 
-### List policies which have policy sets
+### List policies that have policy sets
 
 ```sql
 select
