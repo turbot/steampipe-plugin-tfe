@@ -79,7 +79,6 @@ connection "tfe" {
 
 ## Multi-Organization Connections
 
-
 You may create multiple tfe connections:
 ```hcl
 connection "tfe_01" {
