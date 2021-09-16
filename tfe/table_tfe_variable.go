@@ -10,17 +10,17 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-func tableTfeWorkspaceVariable(ctx context.Context) *plugin.Table {
+func tableTfeVariable(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "tfe_workspace_variable",
+		Name:        "tfe_variable",
 		Description: "Workspace variables for the user.",
 		List: &plugin.ListConfig{
 			KeyColumns: plugin.SingleColumn("workspace_id"),
-			Hydrate:    listWorkspaceVariable,
+			Hydrate:    listVariable,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.AllColumns([]string{"workspace_id", "id"}),
-			Hydrate:    getWorkspaceVariable,
+			Hydrate:    getVariable,
 		},
 		Columns: []*plugin.Column{
 			// Top columns
@@ -37,10 +37,10 @@ func tableTfeWorkspaceVariable(ctx context.Context) *plugin.Table {
 	}
 }
 
-func listWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_workspace_variable.listVariable", "connection_error", err)
+		plugin.Logger(ctx).Error("tfe_variable.listVariable", "connection_error", err)
 		return nil, err
 	}
 	limit := d.QueryContext.Limit
@@ -60,7 +60,7 @@ func listWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	for pagesLeft {
 		result, err := conn.Variables.List(ctx, d.KeyColumnQuals["workspace_id"].GetStringValue(), options)
 		if err != nil {
-			plugin.Logger(ctx).Error("tfe_workspace_variable.listVariable", "query_error", err)
+			plugin.Logger(ctx).Error("tfe_variable.listVariable", "query_error", err)
 			return nil, err
 		}
 		for _, i := range result.Items {
@@ -80,7 +80,7 @@ func listWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	return nil, nil
 }
 
-func getWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func getVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	workspaceId := d.KeyColumnQuals["workspace_id"].GetStringValue()
 	variableId := d.KeyColumnQuals["id"].GetStringValue()
 
@@ -90,13 +90,13 @@ func getWorkspaceVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.Hy
 
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_workspace_variable.getVariable", "connection_error", err)
+		plugin.Logger(ctx).Error("tfe_variable.getVariable", "connection_error", err)
 		return nil, err
 	}
 
 	result, err := conn.Variables.Read(ctx, workspaceId, variableId)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_workspace_variable.getVariable", "query_error", err)
+		plugin.Logger(ctx).Error("tfe_variable.getVariable", "query_error", err)
 		return nil, err
 	}
 	return result, nil

@@ -9,16 +9,16 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/plugin/transform"
 )
 
-func tableTfePolicy(ctx context.Context) *plugin.Table {
+func tableTfeSentinelPolicy(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "tfe_policy",
-		Description: "Policies in the organization.",
+		Name:        "tfe_sentinel_policy",
+		Description: "Sentinel Policy as Code is an embedded policy as code framework integrated with Terraform Enterprise.",
 		List: &plugin.ListConfig{
-			Hydrate: listPolicy,
+			Hydrate: listSentinelPolicy,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("id"),
-			Hydrate:    getPolicy,
+			Hydrate:    getSentinelPolicy,
 		},
 		Columns: []*plugin.Column{
 			// Top columns
@@ -35,10 +35,10 @@ func tableTfePolicy(ctx context.Context) *plugin.Table {
 	}
 }
 
-func listPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func listSentinelPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_policy.listPolicy", "connection_error", err)
+		plugin.Logger(ctx).Error("tfe_sentinel_policy.listSentinelPolicy", "connection_error", err)
 		return nil, err
 	}
 	data, err := GetOrganizationName(ctx, d, h)
@@ -66,7 +66,7 @@ func listPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 			if isNotFoundError(err) {
 				return nil, nil
 			}
-			plugin.Logger(ctx).Error("tfe_policy.listPolicy", "query_error", err)
+			plugin.Logger(ctx).Error("tfe_sentinel_policy.listSentinelPolicy", "query_error", err)
 			return nil, err
 		}
 		for _, i := range result.Items {
@@ -86,15 +86,15 @@ func listPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 	return nil, nil
 }
 
-func getPolicy(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func getSentinelPolicy(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_policy.getPolicy", "connection_error", err)
+		plugin.Logger(ctx).Error("tfe_sentinel_policy.getSentinelPolicy", "connection_error", err)
 		return nil, err
 	}
 	result, err := conn.Policies.Read(ctx, d.KeyColumnQuals["id"].GetStringValue())
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_policy.getPolicy", "query_error", err)
+		plugin.Logger(ctx).Error("tfe_sentinel_policy.getSentinelPolicy", "query_error", err)
 		return nil, err
 	}
 	return result, nil

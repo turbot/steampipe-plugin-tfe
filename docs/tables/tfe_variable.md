@@ -1,4 +1,4 @@
-# Table: tfe_workspace_variable
+# Table: tfe_variable
 
 List variables in a workspace.
 
@@ -18,7 +18,7 @@ select
   category,
   sensitive
 from
-  tfe_workspace_variable
+  tfe_variable
 where
   workspace_id = 'ws-1SWwYqrgF3Aeazmn';
 ```
@@ -32,7 +32,7 @@ select
   value,
   category
 from
-  tfe_workspace_variable
+  tfe_variable
 where
   workspace_id = 'ws-1SWwYqrgF3Aeazmn' and category = 'env';
 ```
@@ -46,7 +46,7 @@ select
   value,
   sensitive
 from
-  tfe_workspace_variable
+  tfe_variable
 where
   workspace_id = 'ws-1SWwYqrgF3Aeazmn' and sensitive;
 ```

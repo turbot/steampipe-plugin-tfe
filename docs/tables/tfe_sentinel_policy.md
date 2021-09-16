@@ -1,4 +1,4 @@
-# Table: tfe_policy
+# Table: tfe_sentinel_policy
 
 List policies in a Terraform Enterprise organization.
 
@@ -10,7 +10,7 @@ List policies in a Terraform Enterprise organization.
 select
   *
 from
-  tfe_policy;
+  tfe_sentinel_policy;
 ```
 
 ### List policies that have policy sets
@@ -21,7 +21,7 @@ select
   name,
   policy_set_count
 from
-  tfe_policy
+  tfe_sentinel_policy
 where
   policy_set_count > 0;
 ```
@@ -32,7 +32,7 @@ where
 select
   *
 from
-  tfe_policy
+  tfe_sentinel_policy
 where
   id = 'pol-vjgEm4UE6hCsU6a2';
 ```
