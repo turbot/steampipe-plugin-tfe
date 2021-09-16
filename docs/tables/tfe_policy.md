@@ -26,7 +26,7 @@ where
   policy_set_count > 0;
 ```
 
-### Get a policy by ID
+### Get policy by ID
 
 ```sql
 select
