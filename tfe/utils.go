@@ -58,9 +58,14 @@ func connect(ctx context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	}
 	transport.TLSClientConfig.InsecureSkipVerify = sslSkipVerify
 
+	// Default to Terraform Cloud host service
+	if hostname == "" {
+		hostname = "https://app.terraform.io"
+	}
+
 	if !strings.HasPrefix(hostname, "https://") {
-			hostname =  "https://"+hostname
-		}
+		hostname = "https://" + hostname
+	}
 
 	// Create a new TFE client config
 	cfg := &tfe.Config{
