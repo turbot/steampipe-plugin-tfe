@@ -1,10 +1,10 @@
 # Table: tfe_ssh_key
 
-List ssh keys in a Terraform Enterprise organization.
+List SSH keys in a Terraform Enterprise organization.
 
 ## Examples
 
-### List ssh keys in a organization
+### Basic info
 
 ```sql
 select
@@ -13,7 +13,7 @@ from
   tfe_ssh_key;
 ```
 
-### Get a ssh keys by id
+### Get an SSH keys by ID
 
 ```sql
 select
