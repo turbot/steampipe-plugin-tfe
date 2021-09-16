@@ -13,7 +13,7 @@ from
   tfe_oauth_client;
 ```
 
-### Get an OAuth client by ID
+### Get OAuth client by ID
 
 ```sql
 select
