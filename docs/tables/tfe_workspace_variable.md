@@ -8,7 +8,7 @@ Notes:
 
 ## Examples
 
-### List variables in a workspaces
+### Basic info
 
 ```sql
 select
@@ -23,7 +23,7 @@ where
   workspace_id = 'ws-1SWwYqrgF3Aeazmn';
 ```
 
-### List environment variables in a workspace
+### List environment variables
 
 ```sql
 select
@@ -37,7 +37,7 @@ where
   workspace_id = 'ws-1SWwYqrgF3Aeazmn' and category = 'env';
 ```
 
-### List sensitive variables in a workspace
+### List sensitive variables
 
 ```sql
 select
