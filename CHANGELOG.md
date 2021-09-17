@@ -1,3 +1,9 @@
+## v0.0.2 [2021-09-17]
+
+_Bug fixes_
+
+- Fixed: Brand color is now correct
+
 ## v0.0.1 [2021-09-17]
 
 _What's new?_
