@@ -2,7 +2,7 @@
 organization: Turbot
 category: ["software development"]
 icon_url: "/images/plugins/turbot/tfe.svg"
-brand_color: "#4e7e14"
+brand_color: "#844FBA"
 display_name: "Terraform Enterprise"
 short_name: "tfe"
 description: "Steampipe plugin to query resources, users and more from Terraform Enterprise."
