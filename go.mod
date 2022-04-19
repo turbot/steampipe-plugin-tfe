@@ -1,6 +1,6 @@
 module github.com/turbot/steampipe-plugin-tfe
 
-go 1.17
+go 1.18
 
 require (
 	github.com/hashicorp/go-tfe v0.17.1
