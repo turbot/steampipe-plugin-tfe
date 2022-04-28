@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/go-tfe"
 	"github.com/pkg/errors"
 
-	"github.com/turbot/steampipe-plugin-sdk/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
 func connect(ctx context.Context, d *plugin.QueryData) (*tfe.Client, error) {
