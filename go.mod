@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/hashicorp/go-tfe v0.17.1
 	github.com/pkg/errors v0.9.1
-	github.com/turbot/steampipe-plugin-sdk/v3 v3.3.1
+	github.com/turbot/steampipe-plugin-sdk/v3 v3.3.2
 )
 
 require (
