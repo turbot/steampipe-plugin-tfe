@@ -5,8 +5,8 @@ import (
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
 )
 
 func tableTfeUserToken(ctx context.Context) *plugin.Table {
@@ -41,6 +41,10 @@ func listUserToken(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 	}
 	for _, i := range result.Items {
 		d.StreamListItem(ctx, i)
+		// Context can be cancelled due to manual cancellation or the limit has been hit
+		if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			return nil, nil
+		}
 	}
 	return nil, nil
 }

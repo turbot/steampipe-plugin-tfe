@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/go-tfe"
-	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 )
 
 func tableTfeSshKey(ctx context.Context) *plugin.Table {
@@ -14,7 +14,7 @@ func tableTfeSshKey(ctx context.Context) *plugin.Table {
 		Name:        "tfe_ssh_key",
 		Description: "SSH keys in the organization.",
 		List: &plugin.ListConfig{
-			Hydrate:    listSshKey,
+			Hydrate: listSshKey,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("id"),
@@ -67,7 +67,7 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if plugin.IsCancelled(ctx) {
+			if d.QueryStatus.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}

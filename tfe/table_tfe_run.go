@@ -5,9 +5,9 @@ import (
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 )
 
 func tableTfeRun(ctx context.Context) *plugin.Table {
@@ -84,7 +84,7 @@ func listRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if plugin.IsCancelled(ctx) {
+			if d.QueryStatus.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}

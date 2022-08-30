@@ -5,9 +5,9 @@ import (
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
 )
 
 func tableTfeOrganizationMember(ctx context.Context) *plugin.Table {
@@ -65,7 +65,8 @@ func listOrganizationMember(ctx context.Context, d *plugin.QueryData, h *plugin.
 		}
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
-			if plugin.IsCancelled(ctx) {
+			// Context can be cancelled due to manual cancellation or the limit has been hit
+			if d.QueryStatus.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}
