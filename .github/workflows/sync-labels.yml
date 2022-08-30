@@ -1,7 +1,7 @@
 name: Sync Labels
 on:
   schedule:
-    - cron: "30 22 * * *"
+    - cron: "30 22 * * 1"
   workflow_dispatch:
 
 jobs:
