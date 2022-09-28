@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/hashicorp/go-tfe v0.17.1
 	github.com/pkg/errors v0.9.1
-	github.com/turbot/steampipe-plugin-sdk/v4 v4.1.4
+	github.com/turbot/steampipe-plugin-sdk/v4 v4.1.7
 )
 
 require (
@@ -34,7 +34,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.0 // indirect
-	github.com/hashicorp/go-hclog v1.2.0 // indirect
+	github.com/hashicorp/go-hclog v1.2.2 // indirect
 	github.com/hashicorp/go-plugin v1.4.4 // indirect
 	github.com/hashicorp/go-retryablehttp v0.5.2 // indirect
 	github.com/hashicorp/go-slug v0.7.0 // indirect
