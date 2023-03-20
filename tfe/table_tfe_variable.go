@@ -5,9 +5,9 @@ import (
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableTfeVariable(ctx context.Context) *plugin.Table {
@@ -58,7 +58,7 @@ func listVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateDat
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Variables.List(ctx, d.KeyColumnQuals["workspace_id"].GetStringValue(), options)
+		result, err := conn.Variables.List(ctx, d.EqualsQuals["workspace_id"].GetStringValue(), options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_variable.listVariable", "query_error", err)
 			return nil, err
@@ -66,7 +66,7 @@ func listVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateDat
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}
@@ -81,8 +81,8 @@ func listVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateDat
 }
 
 func getVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	workspaceId := d.KeyColumnQuals["workspace_id"].GetStringValue()
-	variableId := d.KeyColumnQuals["id"].GetStringValue()
+	workspaceId := d.EqualsQuals["workspace_id"].GetStringValue()
+	variableId := d.EqualsQuals["id"].GetStringValue()
 
 	if workspaceId == "" || variableId == "" {
 		return nil, nil

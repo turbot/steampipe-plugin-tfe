@@ -5,9 +5,9 @@ import (
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableTfeRun(ctx context.Context) *plugin.Table {
@@ -76,7 +76,7 @@ func listRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Runs.List(ctx, d.KeyColumnQuals["workspace_id"].GetStringValue(), options)
+		result, err := conn.Runs.List(ctx, d.EqualsQuals["workspace_id"].GetStringValue(), options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_run.listRun", "query_error", err)
 			return nil, err
@@ -84,7 +84,7 @@ func listRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}
@@ -105,7 +105,7 @@ func getRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (in
 		return nil, err
 	}
 	include := "plan,apply,created_by,cost_estimate,configuration_version,configuration_version.ingress_attributes,workspace"
-	result, err := conn.Runs.ReadWithOptions(ctx, d.KeyColumnQuals["id"].GetStringValue(), &tfe.RunReadOptions{Include: include})
+	result, err := conn.Runs.ReadWithOptions(ctx, d.EqualsQuals["id"].GetStringValue(), &tfe.RunReadOptions{Include: include})
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_run.getRun", "query_error", err)
 		return nil, err
