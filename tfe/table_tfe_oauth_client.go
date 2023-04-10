@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/go-tfe"
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableTfeOauthClient(ctx context.Context) *plugin.Table {
@@ -78,7 +78,7 @@ func listOauthClient(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrate
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}
@@ -99,7 +99,7 @@ func getOauthClient(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateD
 		plugin.Logger(ctx).Error("tfe_oauth_client.getOauthClient", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.OAuthClients.Read(ctx, d.KeyColumnQuals["id"].GetStringValue())
+	result, err := conn.OAuthClients.Read(ctx, d.EqualsQuals["id"].GetStringValue())
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_oauth_client.getOauthClient", "query_error", err)
 		return nil, err

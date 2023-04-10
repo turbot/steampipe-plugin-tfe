@@ -5,9 +5,9 @@ import (
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableTfeWorkspace(ctx context.Context) *plugin.Table {
@@ -101,7 +101,7 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 		for _, i := range result.Items {
 			d.StreamListItem(ctx, i)
 			// Context can be cancelled due to manual cancellation or the limit has been hit
-			if d.QueryStatus.RowsRemaining(ctx) == 0 {
+			if d.RowsRemaining(ctx) == 0 {
 				return nil, nil
 			}
 		}
@@ -122,7 +122,7 @@ func getWorkspace(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateDat
 		return nil, err
 	}
 	opts := tfe.WorkspaceReadOptions{Include: "current_run"}
-	result, err := conn.Workspaces.ReadByIDWithOptions(ctx, d.KeyColumnQuals["id"].GetStringValue(), &opts)
+	result, err := conn.Workspaces.ReadByIDWithOptions(ctx, d.EqualsQuals["id"].GetStringValue(), &opts)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_organization.getWorkspace", "query_error", err)
 		return nil, err
