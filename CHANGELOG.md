@@ -2,7 +2,7 @@
 
 _Bug fixes_
 
-- Fixed the `vcs_repo` column in `tfe_workspace` table to correctly return data instead of null. ([#22](https://github.com/turbot/steampipe-plugin-tfe/pull/22))
+- Fixed the `vcs_repo` column in `tfe_workspace` table to correctly return data instead of `null`. ([#22](https://github.com/turbot/steampipe-plugin-tfe/pull/22))
 
 ## v0.4.0 [2023-04-10]
 
