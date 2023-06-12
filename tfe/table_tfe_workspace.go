@@ -59,7 +59,7 @@ func tableTfeWorkspace(ctx context.Context) *plugin.Table {
 			{Name: "terraform_version", Type: proto.ColumnType_STRING, Description: "The version of Terraform to use for this workspace. Upon creating a workspace, the latest version is selected unless otherwise specified (e.g. 0.11.1)."},
 			{Name: "trigger_prefixes", Type: proto.ColumnType_JSON, Description: "List of repository-root-relative paths which should be tracked for changes, in addition to the working directory."},
 			{Name: "updated_at", Type: proto.ColumnType_TIMESTAMP, Description: "When the workspace was last updated."},
-			{Name: "vcs_repo", Type: proto.ColumnType_JSON, Description: "Settings for the workspace's VCS repository. If omitted, the workspace is created without a VCS repo."},
+			{Name: "vcs_repo", Type: proto.ColumnType_JSON, Description: "Settings for the workspace's VCS repository. If omitted, the workspace is created without a VCS repo.", Transform: transform.FromField("VCSRepo")},
 			{Name: "working_directory", Type: proto.ColumnType_STRING, Description: "A relative path that Terraform will execute within. This defaults to the root of your repository and is typically set to a subdirectory matching the environment when multiple environments exist within the same repository."},
 		},
 	}
