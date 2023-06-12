@@ -38,7 +38,5 @@ select
   vcs_repo ->> 'RepositoryHTTPURL' as vcs_repo_repository_http_url,
   vcs_repo ->> 'ServiceProvider' as vcs_repo_service_provider
 from
-  tfe_workspace
-where
-  vcs_repo is not null;
+  tfe_workspace;
 ```
