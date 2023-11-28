@@ -47,6 +47,7 @@ func tableTfeWorkspace(ctx context.Context) *plugin.Table {
 			{Name: "permissions", Type: proto.ColumnType_JSON, Description: ""},
 			{Name: "plan_duration_average", Type: proto.ColumnType_STRING, Description: "This is the average time runs spend in the plan phase, represented in milliseconds."},
 			{Name: "policy_check_failures", Type: proto.ColumnType_INT, Description: "Reports the number of run failures resulting from a policy check failure."},
+			{Name: "project_id", Type: proto.ColumnType_STRING, Description: "The workspace's project ID.", Transform: transform.FromField("Project.ID")},
 			{Name: "queue_all_runs", Type: proto.ColumnType_BOOL, Description: "Whether runs should be queued immediately after workspace creation. When set to false, runs triggered by a VCS change will not be queued until at least one run is manually queued."},
 			{Name: "resource_count", Type: proto.ColumnType_INT, Description: "Number of resources in the workspace."},
 			{Name: "run_failures", Type: proto.ColumnType_INT, Description: "Reports the number of failed runs."},
