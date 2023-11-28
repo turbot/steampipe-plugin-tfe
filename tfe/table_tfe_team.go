@@ -59,7 +59,7 @@ func listTeam(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (
 	}
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Teams.List(ctx, organizationName, options)
+		result, err := conn.Teams.List(ctx, organizationName, &options)
 		if err != nil {
 			if isNotFoundError(err) {
 				return nil, nil

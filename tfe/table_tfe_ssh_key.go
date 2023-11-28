@@ -56,7 +56,7 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.SSHKeys.List(ctx, organizationName, options)
+		result, err := conn.SSHKeys.List(ctx, organizationName, &options)
 		if err != nil {
 			if isNotFoundError(err) {
 				return nil, nil

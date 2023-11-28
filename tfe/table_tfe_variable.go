@@ -58,7 +58,7 @@ func listVariable(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateDat
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Variables.List(ctx, d.EqualsQuals["workspace_id"].GetStringValue(), options)
+		result, err := conn.Variables.List(ctx, d.EqualsQuals["workspace_id"].GetStringValue(), &options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_variable.listVariable", "query_error", err)
 			return nil, err

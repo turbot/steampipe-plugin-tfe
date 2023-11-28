@@ -67,7 +67,7 @@ func listOauthClient(ctx context.Context, d *plugin.QueryData, h *plugin.Hydrate
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.OAuthClients.List(ctx, organizationName, options)
+		result, err := conn.OAuthClients.List(ctx, organizationName, &options)
 		if err != nil {
 			if isNotFoundError(err) {
 				return nil, nil
