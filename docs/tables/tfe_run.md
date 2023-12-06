@@ -11,6 +11,9 @@ A Run in Terraform Cloud represents a single run of Terraform in a workspace. It
 
 The `tfe_run` table provides insights into Runs within Terraform Cloud. As a DevOps engineer, explore run-specific details through this table, including status, timestamps, and associated resources. Utilize it to understand the state of infrastructure changes, the progress of runs, and the details of associated resources.
 
+**Important Notes**
+- You must specify the `workspace_id` in the `where` clause to query this table.
+
 ## Examples
 
 ### List runs

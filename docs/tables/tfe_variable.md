@@ -11,6 +11,9 @@ A Terraform Enterprise Variable is a key-value pair that defines the infrastruct
 
 The `tfe_variable` table provides insights into Variables within Terraform Enterprise. As a DevOps engineer, explore variable-specific details through this table, including key-value pairs, category, and associated workspace. Utilize it to manage and organize your resources, customize your execution plan, and securely store sensitive information.
 
+**Important Notes**
+- You must specify the `workspace_id` in the `where` clause to query this table.
+
 ## Examples
 
 ### Basic info
