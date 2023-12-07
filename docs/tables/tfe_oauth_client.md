@@ -16,7 +16,14 @@ The `tfe_oauth_client` table provides insights into OAuth Clients within Terrafo
 ### Basic info
 Explore the OAuth client details within your infrastructure to gain insights into their configuration and usage. This can be useful in understanding the client's behavior and identifying any potential issues or areas for improvement.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_oauth_client;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,7 +33,16 @@ from
 ### Get OAuth client by ID
 Explore which OAuth client corresponds to a specific ID to manage access and permissions more effectively. This can be useful in scenarios where you need to understand the access granted to a particular client or troubleshoot issues related to client permissions.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_oauth_client
+where
+  id = 'oc-JM8tnPzgdo1wM3jy';
+```
+
+```sql+sqlite
 select
   *
 from
@@ -38,11 +54,22 @@ where
 ### List OAuth clients sorted by age
 Analyze the settings to understand the age of your OAuth clients, allowing you to prioritize updates or maintenance based on their age. This can be useful in managing the lifecycle of your OAuth clients and ensuring older clients are still functioning properly.
 
-```sql
+```sql+postgres
 select
   id,
   created_at,
   date_part('day', age(current_timestamp, created_at)) as age_days
+from
+  tfe_oauth_client
+order by
+  age_days desc;
+```
+
+```sql+sqlite
+select
+  id,
+  created_at,
+  julianday('now') - julianday(created_at) as age_days
 from
   tfe_oauth_client
 order by

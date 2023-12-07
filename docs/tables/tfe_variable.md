@@ -19,7 +19,20 @@ The `tfe_variable` table provides insights into Variables within Terraform Enter
 ### Basic info
 Discover the segments that contain sensitive information within a specific workspace. This is beneficial in maintaining data security and ensuring only authorized personnel have access to sensitive data.
 
-```sql
+```sql+postgres
+select
+  id,
+  key,
+  value,
+  category,
+  sensitive
+from
+  tfe_variable
+where
+  workspace_id = 'ws-1SWwYqrgF3Aeazmn';
+```
+
+```sql+sqlite
 select
   id,
   key,
@@ -35,7 +48,19 @@ where
 ### List environment variables
 Explore which environment variables are associated with a specific workspace, allowing you to understand and manage the settings and configurations for that workspace.
 
-```sql
+```sql+postgres
+select
+  id,
+  key,
+  value,
+  category
+from
+  tfe_variable
+where
+  workspace_id = 'ws-1SWwYqrgF3Aeazmn' and category = 'env';
+```
+
+```sql+sqlite
 select
   id,
   key,
@@ -50,7 +75,19 @@ where
 ### List sensitive variables
 Analyze the settings to understand which variables within a specific workspace are sensitive. This can aid in maintaining security and confidentiality within your system.
 
-```sql
+```sql+postgres
+select
+  id,
+  key,
+  value,
+  sensitive
+from
+  tfe_variable
+where
+  workspace_id = 'ws-1SWwYqrgF3Aeazmn' and sensitive;
+```
+
+```sql+sqlite
 select
   id,
   key,

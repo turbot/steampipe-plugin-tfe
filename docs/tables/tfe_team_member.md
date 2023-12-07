@@ -16,7 +16,14 @@ The `tfe_team_member` table provides insights into Team Members within Terraform
 ### List all teams and members
 Discover the segments that include all teams and their respective members. This can be useful to gain an overview of team composition and structure in your organization.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_team_member;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,7 +33,16 @@ from
 ### List all members of given team
 Explore which individuals are part of a specific team, assisting in team management and understanding team composition. This can be particularly useful when auditing team membership or planning resource allocation.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_team_member
+where
+  team_id = 'team-ym4653V1jk9V9FCr';
+```
+
+```sql+sqlite
 select
   *
 from
@@ -38,7 +54,16 @@ where
 ### List teams for a user
 Discover the teams a specific user is a part of, which can be useful for assessing their roles and responsibilities within the organization.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_team_member
+where
+  user_id = 'user-hHKqSi2HyqZ4iJZs';
+```
+
+```sql+sqlite
 select
   *
 from
@@ -50,11 +75,20 @@ where
 ### List all service accounts
 Explore which team members are associated with service accounts. This can be useful for managing access permissions and ensuring security protocols are being followed.
 
-```sql
+```sql+postgres
 select
   *
 from
   tfe_team_member
 where
   is_service_account;
+```
+
+```sql+sqlite
+select
+  *
+from
+  tfe_team_member
+where
+  is_service_account = 1;
 ```

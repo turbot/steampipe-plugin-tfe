@@ -16,17 +16,24 @@ The `tfe_user_token` table provides insights into User Tokens within Terraform E
 ### List user tokens
 Determine the areas in which user tokens are being utilized. This can provide insights into user activity and potential security risks, allowing for proactive management and prevention of unauthorized access.
 
-```sql
+```sql+postgres
 select
   *
 from
-  tfe_user_token
+  tfe_user_token;
+```
+
+```sql+sqlite
+select
+  *
+from
+  tfe_user_token;
 ```
 
 ### Tokens by age in days
 Analyze the age of user tokens to understand their longevity and usage patterns. This can aid in identifying outdated or rarely used tokens for potential clean-up or renewal.
 
-```sql
+```sql+postgres
 select
   id,
   description,
@@ -35,13 +42,25 @@ select
 from
   tfe_user_token
 order by
-  age_days desc
+  age_days desc;
+```
+
+```sql+sqlite
+select
+  id,
+  description,
+  created_at,
+  julianday('now') - julianday(created_at) as age_days
+from
+  tfe_user_token
+order by
+  age_days desc;
 ```
 
 ### Tokens not used in the last 30 days
 Explore which user tokens have been inactive for the past 30 days. This is useful for identifying potentially unused or forgotten tokens that may need to be reviewed or deleted for security purposes.
 
-```sql
+```sql+postgres
 select
   id,
   description,
@@ -49,5 +68,16 @@ select
 from
   tfe_user_token
 where
-  last_used_at < current_date - interval '30 days'
+  last_used_at < current_date - interval '30 days';
+```
+
+```sql+sqlite
+select
+  id,
+  description,
+  last_used_at
+from
+  tfe_user_token
+where
+  last_used_at < date('now','-30 day');
 ```

@@ -16,7 +16,14 @@ The `tfe_ssh_key` table provides insights into SSH keys within Terraform Enterpr
 ### Basic info
 Explore the SSH keys in your environment to understand their role and usage. This is crucial for maintaining secure access to your systems.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_ssh_key;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,7 +33,16 @@ from
 ### Get SSH key by ID
 Identify specific SSH keys by their unique identifiers to quickly access and manage them, enhancing security and control over your system.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_ssh_key
+where
+  id = 'sshkey-1NSDCvowf3WtbStu';
+```
+
+```sql+sqlite
 select
   *
 from

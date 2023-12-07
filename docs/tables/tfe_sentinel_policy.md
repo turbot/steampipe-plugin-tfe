@@ -16,7 +16,14 @@ The `tfe_sentinel_policy` table provides insights into Sentinel Policies within 
 ### Basic info
 Explore the policies in your Sentinel infrastructure to understand the rules that are currently in place. This can help in assessing your security posture and identifying areas for improvement.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_sentinel_policy;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,7 +33,18 @@ from
 ### List policies that have policy sets
 Discover the Sentinel policies that are associated with one or more policy sets. This can be useful to understand the application of these policies across different sets, helping to manage and optimize policy usage.
 
-```sql
+```sql+postgres
+select
+  id,
+  name,
+  policy_set_count
+from
+  tfe_sentinel_policy
+where
+  policy_set_count > 0;
+```
+
+```sql+sqlite
 select
   id,
   name,
@@ -40,7 +58,16 @@ where
 ### Get policy by ID
 Explore the specific details of a policy by using its unique identifier. This is particularly useful when you need to quickly assess the characteristics of a single policy in your Terraform Enterprise environment.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_sentinel_policy
+where
+  id = 'pol-vjgEm4UE6hCsU6a2';
+```
+
+```sql+sqlite
 select
   *
 from

@@ -16,7 +16,14 @@ The `tfe_team` table provides insights into Teams within Terraform Enterprise. A
 ### List teams
 Explore which teams are present within your organization to understand the distribution of resources and tasks. This can help in managing your resources more efficiently by identifying any gaps or overlaps.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_team;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,7 +33,18 @@ from
 ### Teams with the most users
 Discover the teams that have the highest number of users. This is useful for understanding which teams are the largest and may need additional resources or management.
 
-```sql
+```sql+postgres
+select
+  name,
+  user_count
+from
+  tfe_team
+order by
+  user_count desc
+limit 5;
+```
+
+```sql+sqlite
 select
   name,
   user_count

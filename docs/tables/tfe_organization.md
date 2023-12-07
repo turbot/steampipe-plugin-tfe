@@ -16,22 +16,39 @@ The `tfe_organization` table provides insights into organizations within Terrafo
 ### List organizations
 Explore the different organizations within your network. This allows for better management and understanding of the various groups interacting with your systems.
 
-```sql
+```sql+postgres
 select
   *
 from
-  tfe_organization
+  tfe_organization;
+```
+
+```sql+sqlite
+select
+  *
+from
+  tfe_organization;
 ```
 
 ### Organizations that do not require two factor
 Discover the organizations that do not comply with two-factor authentication. This can be useful for assessing security measures and identifying potential vulnerabilities within your organization.
 
-```sql
+```sql+postgres
 select
   name,
   two_factor_conformant
 from
   tfe_organization
 where
-  not two_factor_conformant
+  not two_factor_conformant;
+```
+
+```sql+sqlite
+select
+  name,
+  two_factor_conformant
+from
+  tfe_organization
+where
+  not two_factor_conformant;
 ```

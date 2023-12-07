@@ -16,20 +16,35 @@ The `tfe_current_user` table provides insights into the authenticated users with
 ### Get user information
 Explore your current user profile details in Terraform Enterprise. This could be useful for auditing or troubleshooting purposes.
 
-```sql
+```sql+postgres
 select
   *
 from
-  tfe_current_user
+  tfe_current_user;
+```
+
+```sql+sqlite
+select
+  *
+from
+  tfe_current_user;
 ```
 
 ### Check if this is a service account
 Determine if the current user is a service account. This is useful for managing user access and identifying potential security risks.
 
-```sql
+```sql+postgres
 select
   username,
   is_service_account
 from
-  tfe_current_user
+  tfe_current_user;
+```
+
+```sql+sqlite
+select
+  username,
+  is_service_account
+from
+  tfe_current_user;
 ```

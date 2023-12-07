@@ -16,7 +16,14 @@ The `tfe_organization_member` table provides insights into the members of an org
 ### List all users who are members of the organization
 Discover the segments that involve all users who are part of an organization. This could be beneficial in understanding the distribution of users across different organizational structures.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  tfe_organization_member;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,10 +33,18 @@ from
 ### Check two factor authentication status for each org member
 Determine the status of two-factor authentication for each member of an organization. This can help enhance security by identifying members who have not yet enabled this feature.
 
-```sql
+```sql+postgres
 select
   username,
   (member -> 'TwoFactor' ->> 'Enabled')::bool as two_factor_enabled
+from
+  tfe_organization_member;
+```
+
+```sql+sqlite
+select
+  username,
+  json_extract(member, '$.TwoFactor.Enabled') as two_factor_enabled
 from
   tfe_organization_member;
 ```
