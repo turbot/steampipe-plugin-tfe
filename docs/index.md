@@ -81,11 +81,6 @@ connection "tfe" {
 }
 ```
 
-## Get involved
-
-- Open source: https://github.com/turbot/steampipe-plugin-tfe
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
-
 ## Multi-Organization Connections
 
 You may create multiple tfe connections:
