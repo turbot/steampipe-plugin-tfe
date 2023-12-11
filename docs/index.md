@@ -8,6 +8,7 @@ short_name: "tfe"
 description: "Steampipe plugin to query resources, users and more from Terraform Enterprise."
 og_description: "Query Terraform Enterprise with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/tfe-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # Terraform Enterprise + Steampipe
