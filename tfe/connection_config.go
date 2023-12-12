@@ -2,29 +2,13 @@ package tfe
 
 import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/schema"
 )
 
 type tfeConfig struct {
-	Hostname      *string `cty:"hostname"`
-	Token         *string `cty:"token"`
-	SSLSkipVerify *bool   `cty:"ssl_skip_verify"`
-	Organization  *string `cty:"organization"`
-}
-
-var ConfigSchema = map[string]*schema.Attribute{
-	"hostname": {
-		Type: schema.TypeString,
-	},
-	"token": {
-		Type: schema.TypeString,
-	},
-	"ssl_skip_verify": {
-		Type: schema.TypeBool,
-	},
-	"organization": {
-		Type: schema.TypeString,
-	},
+	Hostname      *string `hcl:"hostname"`
+	Token         *string `hcl:"token"`
+	SSLSkipVerify *bool   `hcl:"ssl_skip_verify"`
+	Organization  *string `hcl:"organization"`
 }
 
 func ConfigInstance() interface{} {
