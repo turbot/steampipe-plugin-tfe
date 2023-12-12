@@ -15,7 +15,7 @@ engines: ["steampipe", "sqlite", "postgres", "export"]
 
 [Terraform Enterprise](https://www.terraform.io/cloud) is a cloud hosting company that provides virtual private servers and other infrastructure services.
 
-[Steampipe](https://steampipe.io) is an open source CLI to instantly query cloud APIs using SQL.
+[Steampipe](https://steampipe.io) is an open-source zero-ETL engine to instantly query cloud APIs using SQL.
 
 List workspaces in your Terraform Enterprise organization:
 
