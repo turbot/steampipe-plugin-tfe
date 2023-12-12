@@ -8,13 +8,14 @@ short_name: "tfe"
 description: "Steampipe plugin to query resources, users and more from Terraform Enterprise."
 og_description: "Query Terraform Enterprise with SQL! Open source CLI. No DB required."
 og_image: "/images/plugins/turbot/tfe-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # Terraform Enterprise + Steampipe
 
 [Terraform Enterprise](https://www.terraform.io/cloud) is a cloud hosting company that provides virtual private servers and other infrastructure services.
 
-[Steampipe](https://steampipe.io) is an open source CLI to instantly query cloud APIs using SQL.
+[Steampipe](https://steampipe.io) is an open-source zero-ETL engine to instantly query cloud APIs using SQL.
 
 List workspaces in your Terraform Enterprise organization:
 
@@ -79,11 +80,6 @@ connection "tfe" {
   #hostname = "app.terraform.io"
 }
 ```
-
-## Get involved
-
-- Open source: https://github.com/turbot/steampipe-plugin-tfe
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
 
 ## Multi-Organization Connections
 
