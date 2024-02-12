@@ -59,7 +59,7 @@ func listRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		return nil, err
 	}
 	limit := d.QueryContext.Limit
-	include := []tfe.RunIncludeOpt{"plan", "apply", "created_by", "cost_estimate", "configuration_version", "configuration_version.ingress_attributes"}
+	include := []tfe.RunIncludeOpt{tfe.RunPlan, tfe.RunApply, tfe.RunCreatedBy, tfe.RunCostEstimate, tfe.RunConfigVer, tfe.RunConfigVerIngress, tfe.RunWorkspace, tfe.RunTaskStages}
 
 	options := tfe.RunListOptions{
 		Include: include,

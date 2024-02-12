@@ -3,7 +3,7 @@ module github.com/turbot/steampipe-plugin-tfe
 go 1.21
 
 require (
-	github.com/hashicorp/go-tfe v1.41.0
+	github.com/hashicorp/go-tfe v1.43.0
 	github.com/pkg/errors v0.9.1
 	github.com/turbot/steampipe-plugin-sdk/v5 v5.8.0
 )
@@ -56,7 +56,7 @@ require (
 	github.com/hashicorp/go-slug v0.13.3 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
-	github.com/hashicorp/jsonapi v0.0.0-20210826224640-ee7dae0fb22d // indirect
+	github.com/hashicorp/jsonapi v1.2.0 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -96,7 +96,7 @@ require (
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.5.0 // indirect

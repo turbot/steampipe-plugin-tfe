@@ -44,7 +44,7 @@ func listOrganizationMember(ctx context.Context, d *plugin.QueryData, h *plugin.
 	organizationName := data.(string)
 	limit := d.QueryContext.Limit
 	options := tfe.OrganizationMembershipListOptions{
-		Include: []tfe.OrgMembershipIncludeOpt{"user", "teams"},
+		Include: []tfe.OrgMembershipIncludeOpt{tfe.OrgMembershipUser, tfe.OrgMembershipTeam},
 		ListOptions: tfe.ListOptions{
 			// https://www.terraform.io/docs/cloud/api/index.html#pagination
 			PageSize: 100,

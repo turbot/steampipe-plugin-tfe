@@ -77,10 +77,9 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 		return nil, err
 	}
 	organizationName := data.(string)
-	include := []tfe.WSIncludeOpt{"current_run"}
 	limit := d.QueryContext.Limit
 	options := tfe.WorkspaceListOptions{
-		Include: include,
+		Include: []tfe.WSIncludeOpt{tfe.WSCurrentRun},
 		ListOptions: tfe.ListOptions{
 			// https://www.terraform.io/docs/cloud/api/index.html#pagination
 			PageSize: 100,
