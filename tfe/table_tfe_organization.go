@@ -60,7 +60,7 @@ func listOrganization(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 	}
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Organizations.List(ctx, options)
+		result, err := conn.Organizations.List(ctx, &options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_organization.listOrganization", "query_error", err)
 			return nil, err

@@ -2,38 +2,39 @@ package tfe
 
 import (
 	"context"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 
 	"github.com/hashicorp/go-tfe"
+
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
-func tableTfeSshKey(ctx context.Context) *plugin.Table {
+func tableTfeProject(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "tfe_ssh_key",
-		Description: "SSH keys in the organization.",
+		Name:        "tfe_project",
+		Description: "Projects for the workspaces.",
 		List: &plugin.ListConfig{
-			Hydrate: listSshKey,
+			Hydrate: listProject,
 		},
 		Get: &plugin.GetConfig{
 			KeyColumns: plugin.SingleColumn("id"),
-			Hydrate:    getSshKey,
+			Hydrate:    getProject,
 		},
 		Columns: []*plugin.Column{
 			// Top columns
-			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the ssh key."},
-			// Others columns
-			{Name: "id", Type: proto.ColumnType_STRING, Description: "ID of the ssh key."},
-			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the ssh key."},
+			{Name: "id", Type: proto.ColumnType_STRING, Description: "ID of the project."},
+			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the project."},
+			{Name: "organization", Type: proto.ColumnType_JSON, Description: ""},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the project."},
 		},
 	}
 }
 
-func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
+func listProject(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_ssh_key.listSshKey", "connection_error", err)
+		plugin.Logger(ctx).Error("tfe_project.listProject", "connection_error", err)
 		return nil, err
 	}
 	data, err := GetOrganizationName(ctx, d, h)
@@ -42,7 +43,7 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 	}
 	organizationName := data.(string)
 	limit := d.QueryContext.Limit
-	options := tfe.SSHKeyListOptions{
+	options := tfe.ProjectListOptions{
 		ListOptions: tfe.ListOptions{
 			// https://www.terraform.io/docs/cloud/api/index.html#pagination
 			PageSize: 100,
@@ -56,12 +57,9 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.SSHKeys.List(ctx, organizationName, &options)
+		result, err := conn.Projects.List(ctx, organizationName, &options)
 		if err != nil {
-			if isNotFoundError(err) {
-				return nil, nil
-			}
-			plugin.Logger(ctx).Error("tfe_ssh_key.listSshKey", "query_error", err)
+			plugin.Logger(ctx).Error("tfe_project.listProject", "query_error", err)
 			return nil, err
 		}
 		for _, i := range result.Items {
@@ -81,15 +79,15 @@ func listSshKey(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData)
 	return nil, nil
 }
 
-func getSshKey(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func getProject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_ssh_key.getSshKey", "connection_error", err)
+		plugin.Logger(ctx).Error("tfe_project.getProject", "connection_error", err)
 		return nil, err
 	}
-	result, err := conn.SSHKeys.Read(ctx, d.EqualsQuals["id"].GetStringValue())
+	result, err := conn.Projects.Read(ctx, d.EqualsQuals["id"].GetStringValue())
 	if err != nil {
-		plugin.Logger(ctx).Error("tfe_ssh_key.getSshKey", "query_error", err)
+		plugin.Logger(ctx).Error("tfe_project.getProject", "query_error", err)
 		return nil, err
 	}
 	return result, nil
