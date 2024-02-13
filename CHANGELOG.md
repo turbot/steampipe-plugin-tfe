@@ -1,3 +1,10 @@
+## v0.7.0 [2024-02-13]
+
+_What's new?_
+
+- New table added
+  - [tfe_project](https://hub.steampipe.io/plugins/turbot/tfe/tables/tfe_project)
+
 ## v0.6.0 [2023-12-12]
 
 _What's new?_
