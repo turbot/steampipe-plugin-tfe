@@ -59,10 +59,10 @@ func listRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		return nil, err
 	}
 	limit := d.QueryContext.Limit
-	include := "plan,apply,created_by,cost_estimate,configuration_version,configuration_version.ingress_attributes"
+	include := []tfe.RunIncludeOpt{tfe.RunPlan, tfe.RunApply, tfe.RunCreatedBy, tfe.RunCostEstimate, tfe.RunConfigVer, tfe.RunConfigVerIngress, tfe.RunWorkspace, tfe.RunTaskStages}
 
 	options := tfe.RunListOptions{
-		Include: &include,
+		Include: include,
 		ListOptions: tfe.ListOptions{
 			// https://www.terraform.io/docs/cloud/api/index.html#pagination
 			PageSize: 100,
@@ -76,7 +76,7 @@ func listRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Runs.List(ctx, d.EqualsQuals["workspace_id"].GetStringValue(), options)
+		result, err := conn.Runs.List(ctx, d.EqualsQuals["workspace_id"].GetStringValue(), &options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_run.listRun", "query_error", err)
 			return nil, err
@@ -104,7 +104,7 @@ func getRun(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (in
 		plugin.Logger(ctx).Error("tfe_run.getRun", "connection_error", err)
 		return nil, err
 	}
-	include := "plan,apply,created_by,cost_estimate,configuration_version,configuration_version.ingress_attributes,workspace"
+	include := []tfe.RunIncludeOpt{"plan", "apply", "created_by", "cost_estimate", "configuration_version", "configuration_version.ingress_attributes"}
 	result, err := conn.Runs.ReadWithOptions(ctx, d.EqualsQuals["id"].GetStringValue(), &tfe.RunReadOptions{Include: include})
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_run.getRun", "query_error", err)

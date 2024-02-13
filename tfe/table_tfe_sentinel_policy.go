@@ -61,7 +61,7 @@ func listSentinelPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.Hydr
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Policies.List(ctx, organizationName, options)
+		result, err := conn.Policies.List(ctx, organizationName, &options)
 		if err != nil {
 			if isNotFoundError(err) {
 				return nil, nil

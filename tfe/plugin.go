@@ -23,6 +23,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"tfe_oauth_client":        tableTfeOauthClient(ctx),
 			"tfe_organization":        tableTfeOrganization(ctx),
 			"tfe_organization_member": tableTfeOrganizationMember(ctx),
+			"tfe_project":             tableTfeProject(ctx),
 			"tfe_run":                 tableTfeRun(ctx),
 			"tfe_sentinel_policy":     tableTfeSentinelPolicy(ctx),
 			"tfe_ssh_key":             tableTfeSshKey(ctx),

@@ -44,7 +44,7 @@ func listOrganizationMember(ctx context.Context, d *plugin.QueryData, h *plugin.
 	organizationName := data.(string)
 	limit := d.QueryContext.Limit
 	options := tfe.OrganizationMembershipListOptions{
-		Include: "user,teams",
+		Include: []tfe.OrgMembershipIncludeOpt{tfe.OrgMembershipUser, tfe.OrgMembershipTeam},
 		ListOptions: tfe.ListOptions{
 			// https://www.terraform.io/docs/cloud/api/index.html#pagination
 			PageSize: 100,
@@ -58,7 +58,7 @@ func listOrganizationMember(ctx context.Context, d *plugin.QueryData, h *plugin.
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.OrganizationMemberships.List(ctx, organizationName, options)
+		result, err := conn.OrganizationMemberships.List(ctx, organizationName, &options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_organization_member.listOrganizationMember", "query_error", err)
 			return nil, err

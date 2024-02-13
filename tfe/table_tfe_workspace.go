@@ -47,6 +47,7 @@ func tableTfeWorkspace(ctx context.Context) *plugin.Table {
 			{Name: "permissions", Type: proto.ColumnType_JSON, Description: ""},
 			{Name: "plan_duration_average", Type: proto.ColumnType_STRING, Description: "This is the average time runs spend in the plan phase, represented in milliseconds."},
 			{Name: "policy_check_failures", Type: proto.ColumnType_INT, Description: "Reports the number of run failures resulting from a policy check failure."},
+			{Name: "project_id", Type: proto.ColumnType_STRING, Description: "The workspace's project ID.", Transform: transform.FromField("Project.ID")},
 			{Name: "queue_all_runs", Type: proto.ColumnType_BOOL, Description: "Whether runs should be queued immediately after workspace creation. When set to false, runs triggered by a VCS change will not be queued until at least one run is manually queued."},
 			{Name: "resource_count", Type: proto.ColumnType_INT, Description: "Number of resources in the workspace."},
 			{Name: "run_failures", Type: proto.ColumnType_INT, Description: "Reports the number of failed runs."},
@@ -76,10 +77,9 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 		return nil, err
 	}
 	organizationName := data.(string)
-	include := "current_run"
 	limit := d.QueryContext.Limit
 	options := tfe.WorkspaceListOptions{
-		Include: &include,
+		Include: []tfe.WSIncludeOpt{tfe.WSCurrentRun},
 		ListOptions: tfe.ListOptions{
 			// https://www.terraform.io/docs/cloud/api/index.html#pagination
 			PageSize: 100,
@@ -93,7 +93,7 @@ func listWorkspace(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateDa
 
 	pagesLeft := true
 	for pagesLeft {
-		result, err := conn.Workspaces.List(ctx, organizationName, options)
+		result, err := conn.Workspaces.List(ctx, organizationName, &options)
 		if err != nil {
 			plugin.Logger(ctx).Error("tfe_workspace.listWorkspace", "query_error", err)
 			return nil, err
@@ -121,7 +121,7 @@ func getWorkspace(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateDat
 		plugin.Logger(ctx).Error("tfe_organization.getWorkspace", "connection_error", err)
 		return nil, err
 	}
-	opts := tfe.WorkspaceReadOptions{Include: "current_run"}
+	opts := tfe.WorkspaceReadOptions{Include: []tfe.WSIncludeOpt{"current_run"}}
 	result, err := conn.Workspaces.ReadByIDWithOptions(ctx, d.EqualsQuals["id"].GetStringValue(), &opts)
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_organization.getWorkspace", "query_error", err)
