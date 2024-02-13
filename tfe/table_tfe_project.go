@@ -25,7 +25,7 @@ func tableTfeProject(ctx context.Context) *plugin.Table {
 			// Top columns
 			{Name: "id", Type: proto.ColumnType_STRING, Description: "ID of the project."},
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the project."},
-			{Name: "organization", Type: proto.ColumnType_JSON, Description: ""},
+			{Name: "organization", Type: proto.ColumnType_JSON, Description: "Organization details that the project belongs to."},
 			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the project."},
 		},
 	}
@@ -86,6 +86,7 @@ func getProject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData)
 		return nil, err
 	}
 	result, err := conn.Projects.Read(ctx, d.EqualsQuals["id"].GetStringValue())
+	
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_project.getProject", "query_error", err)
 		return nil, err
