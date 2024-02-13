@@ -3,7 +3,7 @@
 _What's new?_
 
 - New table added
-  - [tfe_project](https://hub.steampipe.io/plugins/turbot/tfe/tables/tfe_project)[#42](https://github.com/turbot/steampipe-plugin-tfe/pull/42) (Thanks [@edebrye](https://github.com/edebrye) for the contribution!)
+  - [tfe_project](https://hub.steampipe.io/plugins/turbot/tfe/tables/tfe_project) ([#42](https://github.com/turbot/steampipe-plugin-tfe/pull/42)) (Thanks [@edebrye](https://github.com/edebrye) for the contribution!)
 
 ## v0.6.0 [2023-12-12]
 
