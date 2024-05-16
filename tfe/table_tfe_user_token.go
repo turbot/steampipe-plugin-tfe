@@ -7,6 +7,7 @@ import (
 
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableTfeUserToken(ctx context.Context) *plugin.Table {
@@ -23,6 +24,7 @@ func tableTfeUserToken(ctx context.Context) *plugin.Table {
 			{Name: "created_at", Type: proto.ColumnType_TIMESTAMP, Description: "Time when the token was created."},
 			{Name: "last_used_at", Type: proto.ColumnType_TIMESTAMP, Description: "Time when the token was last used."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description of the token."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the organization member."},
 		},
 	}
 }
