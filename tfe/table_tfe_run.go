@@ -45,6 +45,7 @@ func tableTfeRun(ctx context.Context) *plugin.Table {
 			{Name: "refresh_only", Type: proto.ColumnType_BOOL, Description: "Whether this run should use the refresh-only plan mode, which will refresh the state without modifying any resources."},
 			{Name: "replace_addrs", Type: proto.ColumnType_JSON, Description: "Optional list of resource addresses to be passed to the -replace flag."},
 			{Name: "source", Type: proto.ColumnType_STRING, Description: "Source of the run request, e.g. tfe-api."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the organization member."},
 			{Name: "status_timestamps", Type: proto.ColumnType_JSON, Description: "Timestamps for status changes in the run."},
 			{Name: "target_addrs", Type: proto.ColumnType_JSON, Description: "Optional list of resource addresses to be passed to the -target flag."},
 			{Name: "workspace_id", Type: proto.ColumnType_STRING, Transform: transform.FromField("Workspace.ID"), Description: "Workspace ID that contains the run."},

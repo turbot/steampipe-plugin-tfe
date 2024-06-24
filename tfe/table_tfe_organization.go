@@ -36,6 +36,7 @@ func tableTfeOrganization(ctx context.Context) *plugin.Table {
 			{Name: "session_timeout", Type: proto.ColumnType_INT, Transform: transform.FromField("SessionTimeout"), Description: "Session timeout after inactivity (minutes)."},
 			{Name: "trial_expires_at", Type: proto.ColumnType_TIMESTAMP, Description: "When the trial, if any, expires."},
 			{Name: "two_factor_conformant", Type: proto.ColumnType_BOOL, Description: "If true, members are required to use two factor authentication."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the organization member."},
 		},
 	}
 }

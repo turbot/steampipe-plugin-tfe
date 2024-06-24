@@ -5,6 +5,7 @@ import (
 
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 func tableTfeCurrentUser(ctx context.Context) *plugin.Table {
@@ -24,6 +25,7 @@ func tableTfeCurrentUser(ctx context.Context) *plugin.Table {
 			{Name: "unconfirmed_email", Type: proto.ColumnType_STRING, Description: "Unconfirmed email address for the user."},
 			{Name: "username", Type: proto.ColumnType_STRING, Description: "Username of the user."},
 			{Name: "v2_only", Type: proto.ColumnType_BOOL, Description: "If true, the user can only use v2."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the organization member."},
 		},
 	}
 }

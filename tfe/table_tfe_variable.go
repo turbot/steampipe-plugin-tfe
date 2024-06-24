@@ -31,6 +31,7 @@ func tableTfeVariable(ctx context.Context) *plugin.Table {
 			{Name: "category", Type: proto.ColumnType_STRING, Description: "Whether this is a Terraform or environment variable. Valid values are terraform or env."},
 			{Name: "sensitive", Type: proto.ColumnType_BOOL, Description: "Whether the value is sensitive. If true then the variable is written once and not visible thereafter. Defaults to false."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description of the variable."},
+			{Name: "organization_name", Type: proto.ColumnType_STRING, Hydrate: GetOrganizationName, Transform: transform.FromValue(), Description: "Name of the organization containing the organization member."},
 			// Other columns
 			{Name: "workspace", Type: proto.ColumnType_JSON, Description: "Workspace information."},
 		},
