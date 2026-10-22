@@ -35,6 +35,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"tfe_ssh_key":             tableTfeSshKey(ctx),
 			"tfe_team":                tableTfeTeam(ctx),
 			"tfe_team_member":         tableTfeTeamMember(ctx),
+			"tfe_team_token":          tableTfeTeamToken(ctx),
 			"tfe_user_token":          tableTfeUserToken(ctx),
 			"tfe_variable":            tableTfeVariable(ctx),
 			"tfe_workspace":           tableTfeWorkspace(ctx),
