@@ -10,14 +10,14 @@ import (
 	"github.com/hashicorp/go-tfe"
 	"github.com/pkg/errors"
 
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
 )
 
 func connect(ctx context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 
 	// Load connection from cache, which preserves throttling protection etc
 	cacheKey := "tfe"
-	if cachedData, ok := d.ConnectionManager.Cache.Get(cacheKey); ok {
+	if cachedData, ok := d.ConnectionCache.Get(ctx, cacheKey); ok {
 		return cachedData.(*tfe.Client), nil
 	}
 
@@ -82,16 +82,16 @@ func connect(ctx context.Context, d *plugin.QueryData) (*tfe.Client, error) {
 	conn.RetryServerErrors(true)
 
 	// Save to cache
-	d.ConnectionManager.Cache.Set(cacheKey, conn)
+	_ = d.ConnectionCache.Set(ctx, cacheKey, conn)
 
 	return conn, nil
 }
 
-func GetOrganizationName(_ context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func GetOrganizationName(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	cacheKey := "GetOrganization"
 
 	// if found in cache, return the result
-	if cachedData, ok := d.ConnectionManager.Cache.Get(cacheKey); ok {
+	if cachedData, ok := d.ConnectionCache.Get(ctx, cacheKey); ok {
 		return cachedData.(string), nil
 	}
 	tfeConfig := GetConfig(d.Connection)
@@ -101,7 +101,7 @@ func GetOrganizationName(_ context.Context, d *plugin.QueryData, _ *plugin.Hydra
 	}
 
 	// save to extension cache
-	d.ConnectionManager.Cache.Set(cacheKey, organization)
+	_ = d.ConnectionCache.Set(ctx, cacheKey, organization)
 	return organization, nil
 
 }

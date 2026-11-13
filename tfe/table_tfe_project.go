@@ -2,12 +2,12 @@ package tfe
 
 import (
 	"context"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin/transform"
 
 	"github.com/hashicorp/go-tfe"
 
-	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
 )
 
 func tableTfeProject(ctx context.Context) *plugin.Table {
@@ -70,8 +70,8 @@ func listProject(ctx context.Context, d *plugin.QueryData, h *plugin.HydrateData
 			}
 		}
 		// Pagination
-		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-			options.PageNumber = result.Pagination.NextPage
+		if result.CurrentPage < result.TotalPages {
+			options.PageNumber = result.NextPage
 		} else {
 			pagesLeft = false
 		}
@@ -86,7 +86,7 @@ func getProject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData)
 		return nil, err
 	}
 	result, err := conn.Projects.Read(ctx, d.EqualsQuals["id"].GetStringValue())
-	
+
 	if err != nil {
 		plugin.Logger(ctx).Error("tfe_project.getProject", "query_error", err)
 		return nil, err

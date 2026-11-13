@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/hashicorp/go-tfe"
-	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v6/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin/transform"
 )
 
 func tableTfeSentinelPolicy(ctx context.Context) *plugin.Table {
@@ -77,8 +77,8 @@ func listSentinelPolicy(ctx context.Context, d *plugin.QueryData, h *plugin.Hydr
 			}
 		}
 		// Pagination
-		if result.Pagination.CurrentPage < result.Pagination.TotalPages {
-			options.PageNumber = result.Pagination.NextPage
+		if result.CurrentPage < result.TotalPages {
+			options.PageNumber = result.NextPage
 		} else {
 			pagesLeft = false
 		}

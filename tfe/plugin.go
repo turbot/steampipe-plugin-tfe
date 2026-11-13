@@ -3,8 +3,8 @@ package tfe
 import (
 	"context"
 
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin/transform"
 )
 
 func Plugin(ctx context.Context) *plugin.Plugin {
@@ -22,7 +22,11 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		//DefaultTransform: transform.FromGo().NullIfZero(),
 		DefaultTransform: transform.FromGo(),
 		DefaultGetConfig: &plugin.GetConfig{
-			ShouldIgnoreError: isNotFoundError,
+			IgnoreConfig: &plugin.IgnoreConfig{
+				ShouldIgnoreErrorFunc: func(_ context.Context, _ *plugin.QueryData, _ *plugin.HydrateData, err error) bool {
+					return isNotFoundError(err)
+				},
+			},
 		},
 		TableMap: map[string]*plugin.Table{
 			"tfe_current_user":        tableTfeCurrentUser(ctx),
